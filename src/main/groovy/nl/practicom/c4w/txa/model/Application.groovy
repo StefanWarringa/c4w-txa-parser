@@ -35,7 +35,7 @@ package nl.practicom.c4w.txa.model
  *   [COMMON]
  *   ...
  */
-class Application {
+class Application implements TxaRoot {
     /**
      * The version number of the application (optional).
      * This value reflects the version of generator, and

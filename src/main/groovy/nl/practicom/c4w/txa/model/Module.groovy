@@ -28,5 +28,5 @@ package nl.practicom.c4w.txa.model
  * [END]
  *
  */
-class Module {
+class Module implements TxaRoot {
 }

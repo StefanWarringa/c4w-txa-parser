@@ -21,7 +21,7 @@ package nl.practicom.c4w.txa.model
  *
  */
 
-class Procedure {
+class Procedure implements TxaRoot {
     String name
     String prototype
     Common common

@@ -3,8 +3,8 @@ package nl.practicom.c4w.txa.model
 abstract class Prompt {
     enum PromptType {
         PICTURE,
-        LONGFORMAT,
-        REALFORMAT,
+        LONG,
+        REAL,
         FILE,
         FIELD,
         KEY,

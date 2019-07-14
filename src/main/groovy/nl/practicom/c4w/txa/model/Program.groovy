@@ -24,7 +24,7 @@ package nl.practicom.c4w.txa.model
  *
  *
  */
-class Program {
+class Program implements TxaRoot {
 
     /**
      * The name of the source file that contains the PROGRAM statement for this application (optional).

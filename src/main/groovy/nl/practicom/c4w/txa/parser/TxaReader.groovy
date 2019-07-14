@@ -1,11 +1,25 @@
 package nl.practicom.c4w.txa.parser
 
-import java.nio.file.Path
+import java.nio.file.Paths
 
+/**
+ * The TXA reader is a forward-only scanner for TXA files
+ * It provides sugar on top of a raw text reader for automatically
+ * concatenating lines that have been split using line continuation '|',
+ * recognizing section marks and regex reads.
+ */
 class TxaReader {
 
-    Reader source
+    // The raw text reader
+    private Reader source
+
+    // The last logical line that was read by readLine
     String currentLine
+
+    // The PHYSICAL line number at which the reader is currently positioned
+    // A logical line may span several physical lines so the number of logical
+    // lines read may be lower
+    long currentLineNumber = 0
 
     TxaReader(String txaFilepath){
         this.source = new File(Paths.get(txaFilepath).normalize().toString()).newReader()
@@ -29,36 +43,22 @@ class TxaReader {
      * @return
      */
     String readLine(autoforward = true){
-        if ( currentLine == null) {
-            def sb = '' << ''
-            while (true) {
-                def line = this.source.readLine()
-                if ( line == null){
-                    return null
-                }
-                if (line.endsWith('|')) {
-                    sb << line.substring(0,line.length()-1)
-                } else {
-                    sb << line
-                    break
-                }
+        def sb = '' << ''
+        while (true) {
+            def line = this.source.readLine()
+            this.currentLineNumber++
+            if ( line == null){
+                return null
             }
-
-            this.currentLine = sb.toString()
+            if (line.endsWith('|')) {
+                sb << line.substring(0,line.length()-1)
+            } else {
+                sb << line
+                break
+            }
         }
 
-        if (autoforward){
-            return forward()
-        } else {
-            return this.currentLine
-        }
-    }
-
-    // Marks the current line as processed and moves pointer forward
-    private String forward() {
-        def tmp = this.currentLine
-        this.currentLine = null
-        return tmp
+        this.currentLine = sb.toString()
     }
 
     /**
@@ -82,13 +82,12 @@ class TxaReader {
         def match = false
 
         while (!match){
-            def line = this.readLine(false)
+            def line = this.readLine()
             if ( line == null) break
             if (line ==~ pattern) {
                 match = true
             } else {
                 lines << line
-                forward()
             }
         }
 
@@ -104,11 +103,10 @@ class TxaReader {
         def lines = []
 
         while (true){
-            def line = this.readLine(false)
+            def line = this.readLine()
             if ( line == null ) break
             if (line ==~ pattern) {
                 lines << line
-                forward()
             } else {
                 break
             }
@@ -116,4 +114,25 @@ class TxaReader {
 
         return lines
     }
+
+    List<String> readUptoNextSection(){
+        def lines = readUptoMatching(/^\[.+\]$/)
+        if ( this.currentLine != null && this.currentLine.isSectionEnd() ) {
+            this.readLines(2)
+        }
+        return lines
+    }
+
+    List<String> readUptoSection(SectionMark sectionMark){
+        return readUptoMatching(sectionMark.matcher)
+    }
+
+    boolean atEOF() {
+        this.currentLineNumber > 0 && this.currentLine == null
+    }
+
+    boolean at(SectionMark mark){
+        !this.atEOF() && this.currentLine.isSectionStart(mark)
+    }
+
 }
