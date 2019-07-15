@@ -78,4 +78,5 @@ class Common {
 
     List<Prompt> prompts
 
+    List<EmbedInstance> embeds
 }

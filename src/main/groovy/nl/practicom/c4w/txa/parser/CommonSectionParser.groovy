@@ -48,8 +48,7 @@ class CommonSectionParser {
         }
 
         if (r.at(SectionMark.EMBED)){
-            //new EmbedSectionParser(model).parse(r)
-            r.readUptoSection(SectionMark.ADDITION)
+            new EmbedSectionParser(model).parse(r)
         }
 
         // ADDITION is repeatable

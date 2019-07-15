@@ -27,7 +27,10 @@ enum SectionMark {
     PRIMARY("[PRIMARY]",/^\[PRIMARY\]$/),
     SECONDARY("[SECONDARY]",/^\[SECONDARY\]$/),
     INSTANCE("[INSTANCE]",/^\[INSTANCE\]$/),
-    KEY("[KEY]",/^\[KEY\]$/)
+    KEY("[KEY]",/^\[KEY\]$/),
+    SOURCE("[SOURCE]", /^\s*\[SOURCE\]\s*$/),
+    GROUP("[GROUP]", /^\s*\[GROUP\]\s*$/),
+    TEMPLATE("[TEMPLATE]", /^\s*\[TEMPLATE\]\s*$/)
 
     def tag
     def matcher
