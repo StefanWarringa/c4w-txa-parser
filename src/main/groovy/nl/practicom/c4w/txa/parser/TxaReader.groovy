@@ -11,29 +11,32 @@ import java.nio.file.Paths
 class TxaReader {
 
     // The raw text reader
-    private Reader source
+    private Reader _source
 
     // The last logical line that was read by readLine
-    String currentLine
+    private String _currentLine
+
+    // End Of File flag
+    private boolean _atEOF = false
 
     // The PHYSICAL line number at which the reader is currently positioned
     // A logical line may span several physical lines so the number of logical
     // lines read may be lower
-    long currentLineNumber = 0
+    private long _currentLineNumber = 0
 
     TxaReader(String txaFilepath){
-        this.source = new File(Paths.get(txaFilepath).normalize().toString()).newReader()
+        this._source = new File(Paths.get(txaFilepath).normalize().toString()).newReader()
     }
 
     TxaReader(StringBuffer contents){
-        this.source = new StringReader(contents.toString())
+        this._source = new StringReader(contents.toString())
     }
 
     @Override
     protected void finalize() throws Throwable {
         super.finalize()
-        if ( this.source != null ){
-            this.source.close()
+        if ( this._source != null ){
+            this._source.close()
         }
     }
 
@@ -42,23 +45,39 @@ class TxaReader {
      * @param autoforward
      * @return
      */
-    String readLine(autoforward = true){
+    String readLine(skipBlank = true){
         def sb = '' << ''
-        while (true) {
-            def line = this.source.readLine()
-            this.currentLineNumber++
+
+        def linesRead = 0
+
+        while (!this.atEOF()) {
+            def line = this._source.readLine()
             if ( line == null){
-                return null
+                this._atEOF = true
             }
-            if (line.endsWith('|')) {
-                sb << line.substring(0,line.length()-1)
-            } else {
-                sb << line
-                break
+            else {
+                this._currentLineNumber++
+                linesRead++
+                if (line.endsWith('|')) {
+                    sb << line.substring(0, line.length() - 1)
+                } else {
+                    if ( !line.trim().isEmpty() || !skipBlank ) {
+                        sb << line
+                        break
+                    }
+                }
             }
         }
 
-        this.currentLine = sb.toString()
+        // Reading past the end of the file will return a null
+        // but current line unaffected
+        if ( linesRead > 0 ){
+            this._currentLine = sb.toString()
+            this._currentLine
+        } else {
+            return null
+        }
+
     }
 
     /**
@@ -77,13 +96,13 @@ class TxaReader {
      * @param pattern - regular expression
      * @return
      */
-    List<String> readUptoMatching(pattern){
+    List<String> readUptoMatching(pattern, skipBlank = true){
         def lines = []
         def match = false
 
-        while (!match){
-            def line = this.readLine()
-            if ( line == null) break
+        while (!this.atEOF() && !match){
+            def line = this.readLine(skipBlank)
+            if ( line == null) break // EOF now
             if (line ==~ pattern) {
                 match = true
             } else {
@@ -99,12 +118,12 @@ class TxaReader {
      * @param pattern - regular expression
      * @return
      */
-    List<String> readWhileMatching(pattern){
+    List<String> readWhileMatching(pattern, skipBlank = true){
         def lines = []
 
-        while (true){
-            def line = this.readLine()
-            if ( line == null ) break
+        while (!this.atEOF()){
+            def line = this.readLine(skipBlank)
+            if ( line == null ) break // EOF now
             if (line ==~ pattern) {
                 lines << line
             } else {
@@ -117,7 +136,7 @@ class TxaReader {
 
     List<String> readUptoNextSection(){
         def lines = readUptoMatching(/^\[.+\]$/)
-        if ( this.currentLine != null && this.currentLine.isSectionEnd() ) {
+        if ( !this.atEOF() && this._currentLine != null && this._currentLine.isSectionEnd() ) {
             this.readLines(2)
         }
         return lines
@@ -127,12 +146,21 @@ class TxaReader {
         return readUptoMatching(sectionMark.matcher)
     }
 
+    String currentLine(){
+        this._currentLine
+    }
+
+    long currentLineNumber(){
+        this._currentLineNumber
+    }
+
+    // write protect the crucial EOF flag
     boolean atEOF() {
-        this.currentLineNumber > 0 && this.currentLine == null
+        this._atEOF
     }
 
     boolean at(SectionMark mark){
-        !this.atEOF() && this.currentLine.isSectionStart(mark)
+        this._currentLine.isSectionStart(mark)
     }
 
 }

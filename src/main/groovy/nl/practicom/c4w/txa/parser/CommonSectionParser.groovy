@@ -12,8 +12,10 @@ class CommonSectionParser {
 
     void parse(TxaReader r){
         def model = new Common()
-        if (r.currentLine.isSectionStart(SectionMark.COMMON)){
-            //r.readLine()
+
+        if (!r.at(SectionMark.COMMON)){
+            r.readUptoSection(SectionMark.COMMON)
+            r.readLine()
         }
 
         def attrs = r.readUptoNextSection()
@@ -35,20 +37,23 @@ class CommonSectionParser {
             }
         }
 
-        if (r.currentLine.isSectionStart(SectionMark.DATA)){
+        if (r.at(SectionMark.DATA)){
             new DataSectionParser(model).parse(r)
         }
-        if (r.currentLine.isSectionStart(SectionMark.FILES)){
+        if (r.at(SectionMark.FILES)){
             new FilesSectionParser(model).parse(r)
         }
-        if (r.currentLine.isSectionStart(SectionMark.PROMPTS)){
+        if (r.at(SectionMark.PROMPTS)){
             new PromptsSectionParser(model).parse(r)
         }
-        if (r.currentLine.isSectionStart(SectionMark.EMBED)){
+
+        if (r.at(SectionMark.EMBED)){
             //new EmbedSectionParser(model).parse(r)
-            r.readUptoNextSection()
+            r.readUptoSection(SectionMark.ADDITION)
         }
-        while (r.currentLine.isSectionStart(SectionMark.ADDITION)){
+
+        // ADDITION is repeatable
+        while (!r.atEOF() && r.at(SectionMark.ADDITION)){
             //new AdditionSectionReader(model).parse(r)
             r.readUptoSection(SectionMark.ADDITION)
         }

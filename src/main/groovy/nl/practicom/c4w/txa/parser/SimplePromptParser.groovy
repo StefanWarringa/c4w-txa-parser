@@ -20,18 +20,20 @@ class SimplePromptParser {
     }
 
     def parse(TxaReader r) {
-        def promptMatcher = (r.currentLine =~ promptPattern)
+        def promptMatcher = (r.currentLine() =~ promptPattern)
 
         if ( promptMatcher.matches()){
             def prompt = new SimplePrompt()
             prompt.name = promptMatcher[0][1] as String
             if ( promptMatcher[0][2] != null ){
-                prompt.isUnique == (promptMatcher[0][2] as String).equalsIgnoreCase("unique")
+                prompt.isUnique = (promptMatcher[0][2] as String).equalsIgnoreCase("unique")
             }
             prompt.type = promptMatcher[0][3] as Prompt.PromptType
-            prompt.values = promptMatcher[0][4] as List
-        } else {
-            r.readLine()
+            prompt.values = (promptMatcher[0][4] as String).fromClarionStringList()
+
+            parent.prompts.add(prompt)
         }
+
+        r.readLine()
     }
 }

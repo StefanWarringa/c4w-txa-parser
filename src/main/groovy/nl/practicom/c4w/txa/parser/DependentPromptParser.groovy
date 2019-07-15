@@ -25,7 +25,7 @@ class DependentPromptParser {
     }
 
     def parse(TxaReader r) {
-        def promptMatcher = (r.currentLine =~ promptPattern)
+        def promptMatcher = (r.currentLine() =~ promptPattern)
         if ( promptMatcher.matches() ) {
             def prompt = new DependentPrompt()
             prompt.name = promptMatcher[0][1] as String
@@ -37,20 +37,32 @@ class DependentPromptParser {
 
             def numConditionals = promptMatcher[0][5] as Integer
 
-            def conditionals = r.readWhileMatching(/^WHEN\s.*/)
-            conditionals.forEach { c ->
-                def whenMatcher = (c =~ whenPattern)
+            //def conditionals = r.readWhileMatching(/^WHEN\s.*/, false)
+            r.readLine()
+
+            numConditionals.times {
+                def whenMatcher = (r.readLine(false) =~ whenPattern)
                 if (whenMatcher.matches()) {
                     prompt.addOption(whenMatcher[0][1] as String, whenMatcher[0][2] as String)
                 }
             }
+//
+//            conditionals.forEach { c ->
+//                def whenMatcher = (c =~ whenPattern)
+//                if (whenMatcher.matches()) {
+//                    prompt.addOption(whenMatcher[0][1] as String, whenMatcher[0][2] as String)
+//                }
+//            }
 
             if (this.parent.prompts == null) {
                 this.parent.prompts = [prompt]
             } else {
                 this.parent.prompts.add(prompt)
             }
-        } else {
+        }
+
+        // WHEN block is followed by blank line(s)
+        while ( !r.atEOF() && r.currentLine().trim().isEmpty() ){
             r.readLine()
         }
     }

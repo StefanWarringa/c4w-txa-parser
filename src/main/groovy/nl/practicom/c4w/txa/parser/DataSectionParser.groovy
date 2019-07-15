@@ -24,9 +24,13 @@ class DataSectionParser {
      * @return
      */
     def parse(TxaReader r) {
-        if ( r.currentLine.isSectionStart(SectionMark.DATA)){
+
+        if ( !r.at(SectionMark.DATA)){
+            r.readUptoSection(SectionMark.DATA)
             r.readLine()
         }
+
+        r.readUptoNextSection()
 
         while ( r.at(SectionMark.SCREENCONTROLS) || r.at(SectionMark.REPORTCONTROLS)){
             //ToDo : process data var

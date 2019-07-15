@@ -18,6 +18,7 @@ public class HoofdmenuTest {
         assert model instanceof Procedure
         assert model.name == "Hoofdmenu"
         assert model.prototype == null
+
         assert model.common != null
         model.common.with {
             assert description == "'Hoofdmenu Invervo'"
@@ -33,13 +34,28 @@ public class HoofdmenuTest {
                 "Stamgegevens",
                 "Medewerkers"
             ]
-            assert prompts.size() == 1
+            assert prompts.size() == 166
             (prompts[0] as DependentPrompt).with {
                 assert name == "ButtonAction"
                 assert type == Prompt.PromptType.DEFAULT
                 assert options.size() == 333
             }
 
+        }
+
+        assert model.window != null
+        model.window.with {
+            assert text == "INkoop VERkoop VOorraad"
+            assert use == "AppFrame"
+            assert isMdiFrame == true
+
+            assert menuBar != null
+            menuBar.with {
+                assert use == "?MENUBAR1"
+                assert ordinalPosition == 1
+                assert menus != null
+                assert menus.size() == 333
+            }
         }
     }
 }

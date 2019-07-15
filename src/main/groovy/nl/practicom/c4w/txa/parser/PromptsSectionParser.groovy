@@ -16,8 +16,8 @@ class PromptsSectionParser {
 
         r.readLine()
 
-        while(r.currentLine.startsWith('%')){
-           def depcount = r.currentLine.findAll("DEPEND").size()
+        while(r.currentLine().startsWith('%')){
+           def depcount = r.currentLine().findAll("DEPEND").size()
            switch (depcount){
                case 0 :
                    new SimplePromptParser(this.parent).parse(r)

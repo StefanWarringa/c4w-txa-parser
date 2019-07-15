@@ -57,6 +57,10 @@ class ClarionStringMixins {
             }
         }
 
+        static fromClarionStringList(String s){
+            return s.replace('(','').replace(')','').split(',')
+        }
+
         static void initialize(){
             String.mixin ClarionStringMixins
         }

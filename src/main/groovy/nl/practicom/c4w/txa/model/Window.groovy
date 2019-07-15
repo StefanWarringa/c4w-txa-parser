@@ -1,6 +1,10 @@
 package nl.practicom.c4w.txa.model
 
 class Window {
+    String text
+    String use
+    boolean isMdiFrame
+
     String rawData
-    Menu menu
+    MenuBar menuBar
 }

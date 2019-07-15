@@ -1,24 +1,50 @@
 package nl.practicom.c4w.txa.parser
 
 import nl.practicom.c4w.txa.meta.ClarionStringMixins;
-import org.junit.Before
-import org.junit.Test
 
-class TxaReaderTest {
+class TxaReaderTest extends GroovyTestCase {
 
-    @Before
-    void setUp() throws Exception {
+    void setUp() {
+        super.setUp()
         ClarionStringMixins.initialize()
     }
 
-    @Test
-    void readLineFromEmptyFileShouldReturnNull() {
+    void testReadlineFromEmptyFileShouldReturnNull() {
         def reader = new TxaReader(''<<'')
+        assert reader.atEOF() == false
+        assert reader.currentLine() == null
+        assert reader.currentLineNumber() == 0
         assert reader.readLine() == null
+        assert reader.atEOF() == true
+        assert reader.currentLine() == null
+        assert reader.currentLineNumber() == 0
     }
 
-    @Test
-    void splitLinesWillBeReadAsSingleLine() {
+    void testReadlineAtEndOfFileDoesHasNoEffect(){
+        def contents = 'the only line'
+        def reader = new TxaReader(''<< contents)
+        assert reader.atEOF() == false
+        assert reader.currentLine() == null
+        assert reader.currentLineNumber() == 0
+        // Read single line. EOF not set because we have not yet attempted
+        // to read past the end
+        assert reader.readLine() == contents
+        assert reader.atEOF() == false
+        assert reader.currentLine() == contents
+        assert reader.currentLineNumber() == 1
+        // Attempt to read past the end: EOF flag is set and nothing returned
+        assert reader.readLine() == null
+        assert reader.atEOF() == true
+        assert reader.currentLine() == contents
+        assert reader.currentLineNumber() == 1
+        // Another attempt has no effect
+        assert reader.readLine() == null
+        assert reader.atEOF() == true
+        assert reader.currentLine() == contents
+        assert reader.currentLineNumber() == 1
+    }
+
+    void testSplitLinesWillBeReadAsSingleLine() {
         def reader = new TxaReader(
                 "This is the |" << "\n" << "first line" << "\n"
             << "This is the |" << "\n" << "second line"
@@ -27,21 +53,42 @@ class TxaReaderTest {
         assert "This is the second line" == reader.readLine()
     }
 
-    @Test
-    void readUptoMatchingExcludesMatchOfCurrentLine() {
+    void testEmptyLinesAreIgnoredByDefault() {
+        def reader = new TxaReader('' << [
+              "first line","  ","third line"
+        ].join("\n"))
+        assert "first line" == reader.readLine()
+        assert "third line" == reader.readLine()
+    }
+
+    void testSingleContinuationIsNotAnEmptyLine() {
+        def reader = new TxaReader('' << [
+                "first line |","|","third line"
+        ].join("\n"))
+        assert "first line third line" == reader.readLine()
+    }
+
+    void testSingleContinuationBeforeLineIsIgnored(){
+        def reader = new TxaReader('' << [
+                "first line","|","third line"
+        ].join("\n"))
+        assert "first line" == reader.readLine()
+        assert "third line" == reader.readLine()
+    }
+
+    void testReadUptoMatchingExcludesMatchOfCurrentLine() {
         def contents = ["first","MARK","second"].join("\n")
         def reader = new TxaReader("" << contents)
         def chunk1 = reader.readUptoMatching(/^MARK/)
         assert chunk1.size() == 1
         assert chunk1.first() == "first"
-        assert "MARK" == reader.currentLine
+        assert "MARK" == reader.currentLine()
         def chunk2 = reader.readUptoMatching(/^MARK/)
         assert chunk2.size() == 1
         assert chunk2.first() == "second"
     }
 
-    @Test
-    void readUptoMatchingStopsAtFirstMatch() {
+    void testReadUptoMatchingStopsAtFirstMatch() {
         def contents = ["first","second","third","MARK1","fourth","fifth","MARK2"].join("\n")
         def reader = new TxaReader("" << contents)
         def chunk1 = reader.readUptoMatching(/^MARK.$/)
@@ -54,8 +101,7 @@ class TxaReaderTest {
         assert chunk2.last() == "fifth"
     }
 
-    @Test
-    void readUptoMatchingReadsAllRemainingLinesIfNoMatch() {
+    void testReadUptoMatchingReadsAllRemainingLinesIfNoMatch() {
         def contents = ["first","second","MARK1","third","fourth","MARK2","fifth","sixth"].join("\n")
         def reader = new TxaReader("" << contents)
         def chunk1 = reader.readUptoMatching(/^MARK2$/)
@@ -67,9 +113,7 @@ class TxaReaderTest {
         assert chunk2.first() == "fifth"
         assert chunk2.last() == "sixth"
     }
-
-    @Test
-    void readWhileMatching() {
+    void testReadWhileMatching() {
         def contents = [
                 "%ButtonName DEPEND %Buttons DEFAULT TIMES 1",
                 "WHEN  ('Default')TIMES 4",
@@ -86,13 +130,12 @@ class TxaReaderTest {
         assert reader.readLine() == "%ButtonName DEPEND %Buttons DEFAULT TIMES 1"
         def whenblock1 = reader.readWhileMatching(/^WHEN\W.*/)
         assert whenblock1.size() == 5
-        assert reader.currentLine == "%DefaultBaseClassType DEPEND %ClassItem DEFAULT TIMES 2"
+        assert reader.currentLine() == "%DefaultBaseClassType DEPEND %ClassItem DEFAULT TIMES 2"
         def whenblock2 = reader.readWhileMatching(/^WHEN\W.*/)
         assert whenblock2.size() == 2
     }
 
-    @Test
-    void readUptoNextSectionReturnsAllLinesBeforeSectionMark(){
+    void testReadUptoNextSectionReturnsAllLinesBeforeSectionMark(){
         def contents = [
                 "first",
                 "second",
@@ -103,11 +146,10 @@ class TxaReaderTest {
         def lines = reader.readUptoNextSection()
         assert lines.size() == 2
         assert lines.last() == "second"
-        assert reader.currentLine == "[SEC1]"
+        assert reader.currentLine() == "[SEC1]"
     }
 
-    @Test
-    void readUptoNextSectionStopsAfterExplicitEnd(){
+    void testReadUptoNextSectionStopsAfterExplicitEnd(){
         def contents = [
                 "first",
                 "second",
@@ -119,11 +161,10 @@ class TxaReaderTest {
         assert lines.size() == 2
         assert lines.last() == "second"
         // Note that the end marker is skipped!
-        assert reader.currentLine == "third"
+        assert reader.currentLine() == "third"
     }
 
-    @Test
-    void readUptoSectionSlurpsIntermediateSections() {
+    void testReadUptoSectionSlurpsIntermediateSections() {
         def contents = [
                 "first",
                 "second",
@@ -136,6 +177,6 @@ class TxaReaderTest {
         def lines = reader.readUptoSection(SectionMark.CALLS)
         assert lines.size() == 4
         assert lines.last() == "third"
-        assert reader.currentLine.asSectionMark() == SectionMark.CALLS
+        assert reader.currentLine().asSectionMark() == SectionMark.CALLS
     }
 }
