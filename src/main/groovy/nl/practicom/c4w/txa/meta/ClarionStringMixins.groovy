@@ -35,6 +35,7 @@ class ClarionStringMixins {
 
         static boolean isSectionStart(String s, SectionMark mark) {
             if ( s == null ) return false
+            if ( mark == null ) return isSectionMark(s)
             if ( !s.isSectionMark() ) return false
             if ( mark.matcher != null) {
                 return s ==~ mark.matcher

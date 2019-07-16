@@ -165,4 +165,11 @@ class TxaReader {
         this._currentLine.isSectionStart(mark)
     }
 
+    boolean atAnySectionStart() {
+        this._currentLine.isSectionMark() && !this.atSectionEndMark()
+    }
+
+    boolean atSectionEndMark(){
+        this.at(SectionMark.SECTIONEND)
+    }
 }
