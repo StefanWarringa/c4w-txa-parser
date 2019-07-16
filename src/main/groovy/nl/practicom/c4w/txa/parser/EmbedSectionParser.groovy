@@ -113,17 +113,24 @@ class EmbedSectionParser {
         def embed =  new EmbedInstance(sourceType: EmbedInstance.SourceType.SOURCE)
 
         // For sourcecode read lines as is
+        // ToDo: remove eager line read
         def source = r.readLine(false, true) << '\n'
-        while ( !( r.atEOF() || r.at(SectionMark.SECTIONEND) || r.currentLine().isSectionStart()) ){
-            source << r.readLine(false, true) << '\n'
+        r.readLine(false, true)
+
+        // Source block implicitly ends at [END] of [DEFINITION] (in case this
+        // is the last definition) or by the start of any other definition
+        // ([GROUP], [PROCEDURE],[SOURCE] or [TEMPLATE]) or if we reach the end of
+        // the file (which should not happen)
+        while ( !( r.atEOF() || r.atSectionEndMark() || r.atAnySectionStart()) ){
+            source << r.currentLine() << '\n'
             // Prevent unnecessary pattern matching
             if ( embed.priority == null ){
                 embed.priority = this.parsePriority(r.currentLine())
             }
+            r.readLine(false, true)
         }
         embed.source = source
 
-        r.readUptoNextSection()
         return embed
     }
 
@@ -134,7 +141,7 @@ class EmbedSectionParser {
 
     EmbedInstance parseProcedureDefinition(TxaReader r) {
         def embed =  new EmbedInstance(sourceType: EmbedInstance.SourceType.PROCEDURE)
-        def embeddedCall = r.readLine()
+        def embeddedCall = r.readLine().trim()
         embed.procedureName = embeddedCall.substring(0,embeddedCall.indexOf('('))
         embed.procedureParams = embeddedCall.substring(embed.procedureName.length())
         embed.priority = this.parsePriority(r.readLine())
@@ -145,7 +152,7 @@ class EmbedSectionParser {
     EmbedInstance parseGroupDefinition(TxaReader r) {
         def embed =  new EmbedInstance(sourceType: EmbedInstance.SourceType.GROUP)
 
-        // Assumption! priority and instance generated in fixed sequence
+        // Assumption: priority and instance generated in fixed sequence!
         embed.priority = parsePriority(r.readLine())
         embed.instanceId = parseInstanceId(r.readLine())
         r.readUptoNextSection()
