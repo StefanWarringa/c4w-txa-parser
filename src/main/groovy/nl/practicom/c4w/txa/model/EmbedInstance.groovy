@@ -64,7 +64,7 @@ class EmbedInstance {
      * PRIORITY 8001
      * PROPERTY:END
      */
-    int priority
+    Integer priority
 
     /**
      * Indicates the location within the embed point where this instance is to be embedded (required).
@@ -86,7 +86,7 @@ class EmbedInstance {
      * [GROUP]
      * INSTANCE 4
      */
-    int instanceId
+    Integer instanceId
 
     /**
      * Name of the procedure for a PROCEDURE source sourceType.
