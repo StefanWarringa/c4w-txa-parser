@@ -10,6 +10,8 @@ import java.nio.file.Paths
  */
 class TxaReader {
 
+    private static anySectionMarkPattern = /^\s*\[.+\]\s*$/
+
     // The raw text reader
     private Reader _source
 
@@ -45,7 +47,7 @@ class TxaReader {
      * @param autoforward
      * @return
      */
-    String readLine(skipBlank = true){
+    String readLine(skipBlank = true, ignoreContinuation = false){
         def sb = '' << ''
 
         def linesRead = 0
@@ -58,7 +60,7 @@ class TxaReader {
             else {
                 this._currentLineNumber++
                 linesRead++
-                if (line.endsWith('|')) {
+                if (!ignoreContinuation && line.endsWith('|')) {
                     sb << line.substring(0, line.length() - 1)
                 } else {
                     if ( !line.trim().isEmpty() || !skipBlank ) {
@@ -135,7 +137,7 @@ class TxaReader {
     }
 
     List<String> readUptoNextSection(){
-        def lines = readUptoMatching(/^\[.+\]$/)
+        def lines = readUptoMatching(anySectionMarkPattern)
         if ( !this.atEOF() && this._currentLine != null && this._currentLine.isSectionEnd() ) {
             this.readLines(2)
         }

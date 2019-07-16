@@ -6,7 +6,7 @@ class ClarionStringMixins {
 
         static SectionMark asSectionMark(String s) {
             if (s == null ) return null
-            def mark = s
+            def mark = s.trim()
             if ( mark.startsWith('[')) mark = mark.substring(1)
             if ( mark.endsWith(']')) mark = mark.substring(0,mark.length()-1)
             try {
@@ -30,7 +30,7 @@ class ClarionStringMixins {
 
         static boolean isSectionMark(String s){
             if ( s == null ) return false
-            return s ==~ /^\[[A-Z]+\]$/
+            return s ==~ /^\s*\[[A-Z]+\]\s*$/
         }
 
         static boolean isSectionStart(String s, SectionMark mark) {
