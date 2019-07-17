@@ -60,7 +60,7 @@ class WindowSectionParserTest extends GroovyTestCase {
         assert procedure.window != null
         assert procedure.window.menuBar != null
         procedure.window.menuBar.with {
-            assert use == "MENUBAR1"
+            assert use == "?MENUBAR1"
             assert ordinalPosition == 1
         }
     }
