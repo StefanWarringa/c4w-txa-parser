@@ -1,32 +1,32 @@
 package nl.practicom.c4w.txa.parser
 
-import nl.practicom.c4w.txa.model.Common
+import nl.practicom.c4w.txa.model.TemplatePrompts
 
 class PromptsSectionParser {
-    Common parent
+    TemplatePrompts model
 
-    PromptsSectionParser(Common parent) {
-        this.parent = parent
+    PromptsSectionParser(TemplatePrompts model) {
+        this.model = model
     }
 
-    def parse(TxaReader r) {
-        if ( !r.at(SectionMark.PROMPTS)){
-            r.readUptoSection(SectionMark.PROMPTS)
+    def parse(TxaReader r, SectionMark promptsSectionMark = SectionMark.PROMPTS) {
+        if ( !r.at(promptsSectionMark) ){
+            r.readUptoSection(promptsSectionMark)
         }
 
         r.readLine()
 
-        while(r.currentLine().startsWith('%')){
+        while(r.currentLine().trim().startsWith('%')){
            def depcount = r.currentLine().findAll("DEPEND").size()
            switch (depcount){
                case 0 :
-                   new SimplePromptParser(this.parent).parse(r)
+                   new SimplePromptParser(this.model).parse(r)
                    break
                case 1 :
-                   new DependentPromptParser(this.parent).parse(r)
+                   new DependentPromptParser(this.model).parse(r)
                    break
                case 2 :
-                   new NestedDependentPromptParser(this.parent).parse(r)
+                   new NestedDependentPromptParser(this.model).parse(r)
                    break
            }
         }

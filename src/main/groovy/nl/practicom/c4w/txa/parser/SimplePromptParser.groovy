@@ -1,7 +1,7 @@
 package nl.practicom.c4w.txa.parser
 
-import nl.practicom.c4w.txa.model.Common
 import nl.practicom.c4w.txa.model.Prompt
+import nl.practicom.c4w.txa.model.TemplatePrompts
 import nl.practicom.c4w.txa.model.SimplePrompt
 
 class SimplePromptParser {
@@ -11,12 +11,12 @@ class SimplePromptParser {
      * <name> (UNIQUE|MULTI) <type> <values
      */
     static promptPattern =
-            /^%(\w*)\s+(UNIQUE|MULTI)?\s+(%picture|LONG|REAL|STRING|FILE|FIELD|KEY|COMPONENT|PROCEDURE|DEFAULT)\s+(\(.*\))$/
+            /^\s*%(\w*)\s+(UNIQUE\s|MULTI\s)?\s*(%picture|LONG|REAL|STRING|FILE|FIELD|KEY|COMPONENT|PROCEDURE|DEFAULT)\s+(\(.*\))\s*$/
 
-    Common parent
+    TemplatePrompts model
 
-    SimplePromptParser(Common parent) {
-        this.parent = parent
+    SimplePromptParser(TemplatePrompts model) {
+        this.model = model
     }
 
     def parse(TxaReader r) {
@@ -31,7 +31,11 @@ class SimplePromptParser {
             prompt.type = promptMatcher[0][3] as Prompt.PromptType
             prompt.values = (promptMatcher[0][4] as String).fromClarionStringList()
 
-            parent.prompts.add(prompt)
+            if ( model.prompts == null){
+                model.prompts = [prompt]
+            } else {
+                model.prompts.add(prompt)
+            }
         }
 
         r.readLine()

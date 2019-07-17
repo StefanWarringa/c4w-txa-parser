@@ -1,26 +1,26 @@
 package nl.practicom.c4w.txa.parser
 
-import nl.practicom.c4w.txa.model.Common
 import nl.practicom.c4w.txa.model.DependentPrompt
 import nl.practicom.c4w.txa.model.Prompt
+import nl.practicom.c4w.txa.model.TemplatePrompts
 
 class DependentPromptParser {
-    Common parent
+    TemplatePrompts parent
 
     /*
      *    1               2            (3)        4          5
      * %<name> DEPEND %<parent> <MULTI|UNIQUE> <type> TIMES <n>
      */
     private static promptPattern =
-            /^%(\w*)\s+DEPEND\s+%(\w+)\s+(UNIQUE|MULTI)?\s?(%picture|LONG|REAL|STRING|FILE|FIELD|KEY|COMPONENT|PROCEDURE|DEFAULT)\s+TIMES\s+(.*)$/
+            /^\s*%(\w*)\s+DEPEND\s+%(\w+)\s+(UNIQUE|MULTI)?\s?(%picture|LONG|REAL|STRING|FILE|FIELD|KEY|COMPONENT|PROCEDURE|DEFAULT)\s+TIMES\s+(.*)\s*$/
 
     /*
      *
      * WHEN (<parent value>) (<values>)
      */
-    private static whenPattern = /^WHEN\s+\((.*)\)\s+\((.*)\)$/
+    private static whenPattern = /^\s*WHEN\s+\((.*)\)\s+\((.*)\)\s*$/
 
-    DependentPromptParser(Common parent) {
+    DependentPromptParser(TemplatePrompts parent) {
         this.parent = parent
     }
 
@@ -37,22 +37,15 @@ class DependentPromptParser {
 
             def numConditionals = promptMatcher[0][5] as Integer
 
-            //def conditionals = r.readWhileMatching(/^WHEN\s.*/, false)
-            r.readLine()
-
             numConditionals.times {
-                def whenMatcher = (r.readLine(false) =~ whenPattern)
-                if (whenMatcher.matches()) {
-                    prompt.addOption(whenMatcher[0][1] as String, whenMatcher[0][2] as String)
+                r.readLine()
+                if ( !r.atEOF()) {
+                    def whenMatcher = (r.currentLine() =~ whenPattern)
+                    if (whenMatcher.matches()) {
+                        prompt.addOption(whenMatcher[0][1] as String, whenMatcher[0][2] as String)
+                    }
                 }
             }
-//
-//            conditionals.forEach { c ->
-//                def whenMatcher = (c =~ whenPattern)
-//                if (whenMatcher.matches()) {
-//                    prompt.addOption(whenMatcher[0][1] as String, whenMatcher[0][2] as String)
-//                }
-//            }
 
             if (this.parent.prompts == null) {
                 this.parent.prompts = [prompt]
@@ -62,8 +55,8 @@ class DependentPromptParser {
         }
 
         // WHEN block is followed by blank line(s)
-        while ( !r.atEOF() && r.currentLine().trim().isEmpty() ){
+//        while ( !r.atEOF() && r.currentLine().trim().isEmpty() ){
             r.readLine()
-        }
+//        }
     }
 }

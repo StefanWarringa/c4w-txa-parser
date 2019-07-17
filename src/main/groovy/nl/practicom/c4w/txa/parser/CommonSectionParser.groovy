@@ -1,6 +1,7 @@
 package nl.practicom.c4w.txa.parser
 
 import nl.practicom.c4w.txa.model.Common
+import nl.practicom.c4w.txa.model.TemplatePrompts
 import nl.practicom.c4w.txa.model.TxaRoot
 
 class CommonSectionParser {
@@ -44,7 +45,7 @@ class CommonSectionParser {
             new FilesSectionParser(model).parse(r)
         }
         if (r.at(SectionMark.PROMPTS)){
-            new PromptsSectionParser(model).parse(r)
+            new PromptsSectionParser(model as TemplatePrompts).parse(r)
         }
 
         if (r.at(SectionMark.EMBED)){
@@ -53,8 +54,7 @@ class CommonSectionParser {
 
         // ADDITION is repeatable
         while (!r.atEOF() && r.at(SectionMark.ADDITION)){
-            //new AdditionSectionReader(model).parse(r)
-            r.readUptoSection(SectionMark.ADDITION)
+            new AdditionSectionParser(model).parse(r)
         }
 
         this.parent.common = model

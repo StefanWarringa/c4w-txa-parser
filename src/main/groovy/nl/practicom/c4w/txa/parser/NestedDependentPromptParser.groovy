@@ -1,11 +1,11 @@
 package nl.practicom.c4w.txa.parser
 
-import nl.practicom.c4w.txa.model.Common
+import nl.practicom.c4w.txa.model.TemplatePrompts
 
 class NestedDependentPromptParser {
-    Common parent
+    TemplatePrompts parent
 
-    NestedDependentPromptParser(Common parent) {
+    NestedDependentPromptParser(TemplatePrompts parent) {
         this.parent = parent
     }
 
