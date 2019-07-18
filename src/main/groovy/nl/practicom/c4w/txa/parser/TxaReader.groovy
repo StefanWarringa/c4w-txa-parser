@@ -148,6 +148,17 @@ class TxaReader {
         return readUptoMatching(sectionMark.matcher)
     }
 
+    /**
+     * Reads upto the start of the next section (implicit end) or
+     * upto explicit section ending ([END])or upto EOF
+     * Post condition: current at [END], at section mark of next section or at last line
+     *
+     * @return the lines read between current position and end of section.
+     */
+    List<String> readUptoSectionEnd(){
+        return readUptoMatching(anySectionMarkPattern)
+    }
+
     String currentLine(){
         this._currentLine
     }

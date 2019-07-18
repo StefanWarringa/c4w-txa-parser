@@ -366,11 +366,73 @@ class EmbedSectionParserTest extends GroovyTestCase {
         }
     }
 
+    void testSingleEmbedMultipleInstances() {
+        def content = '''
+        [EMBED]
+        EMBED %ControlEventHandling
+            [INSTANCES]
+                WHEN '?RelatiebeheerPrintendebiteurenOpDebiteurnummer'
+                [INSTANCES]
+                    WHEN 'Accepted'
+                    [DEFINITION]
+                        [SOURCE]
+                        PROPERTY:BEGIN
+                        PRIORITY 4000
+                        PROPERTY:END
+                        !Keuze 'Debiteurnummer'
+                        GloPrintDebiteuren = 'Debiteurnummer'
+                    [END]
+                [END]
+                WHEN '?PrintDEB:KeyZoekcode'
+                [INSTANCES]
+                    WHEN 'Accepted'
+                    [DEFINITION]
+                        [SOURCE]
+                        PROPERTY:BEGIN
+                        PRIORITY 4000
+                        PROPERTY:END
+                        !Keuze 'Zoekcode'
+                        GloPrintDebiteuren = 'Zoekcode'
+                    [END]
+                [END]
+            [END]
+        [END]
+        '''
+
+        def reader = new TxaReader('' << content)
+        reader.readLine()
+
+        def common = new Common()
+        new EmbedSectionParser(common).parse(reader)
+        assert common.embeds != null
+        assert common.embeds.size() == 2
+
+        (common.embeds[0] as EmbedInstance).with {
+            assert embedPoint == "%ControlEventHandling"
+            assert sourceType == EmbedInstance.SourceType.SOURCE
+            assert procedureName == null
+            assert procedureParams == null
+            assert instanceId == null
+            assert embedLocation == ["?RelatiebeheerPrintendebiteurenOpDebiteurnummer","Accepted"]
+            assert priority == 4000
+        }
+        (common.embeds[1] as EmbedInstance).with {
+            assert embedPoint == "%ControlEventHandling"
+            assert sourceType == EmbedInstance.SourceType.SOURCE
+            assert procedureName == null
+            assert procedureParams == null
+            assert instanceId == null
+            assert embedLocation == ["?PrintDEB:KeyZoekcode","Accepted"]
+            assert priority == 4000
+        }
+    }
+
+
     /**
      * The embed section will usually contain multiple
      * embed points.
      */
-    void testMultipleEmbeds(){
+    void testMultipleEmbedsWithoutInstances(){
         def content = '''
             [EMBED]
               EMBED %ProcedureRoutines
@@ -415,5 +477,83 @@ class EmbedSectionParserTest extends GroovyTestCase {
             assert embedLocation == null
             assert priority == 2000
         }
+    }
+
+    void testMultipleEmbedsWithSingleInstance(){
+        def content =  '''
+        [EMBED]
+        EMBED %ControlEventHandling
+            [INSTANCES]
+                WHEN '?RelatiebeheerPrintendebiteurenOpDebiteurnummer'
+                [DEFINITION]
+                     [GROUP]
+                        PRIORITY 4200
+                        INSTANCE 8  
+                [END]
+            [END]
+        EMBED %WindowManagerMethodCodeSection
+            [INSTANCES]
+                WHEN 'Init'
+                [DEFINITION]
+                     [SOURCE]
+                        PROPERTY:BEGIN
+                        PRIORITY 450
+                        PROPERTY:END 
+                [END]
+            [END]
+        [END]
+        '''
+
+        def reader = new TxaReader('' << content)
+        reader.readLine()
+
+        def common = new Common()
+        new EmbedSectionParser(common).parse(reader)
+        assert common.embeds != null
+        assert common.embeds.size() == 2
+
+    }
+    void testMultipleEmbedsWithMultipleNestedInstances(){
+        def content =  '''
+        [EMBED]
+        EMBED %ControlEventHandling
+            [INSTANCES]
+                WHEN '?RelatiebeheerPrintendebiteurenOpDebiteurnummer'
+                [DEFINITION]
+                     [GROUP]
+                        PRIORITY 4200
+                        INSTANCE 8  
+                [END]
+                WHEN '?PrintDEB:KeyZoekcode'
+                [DEFINITION]
+                    [PROCEDURE]
+                        AanmakenBellijst()
+                        PRIORITY 2000    
+                [END]
+            [END]
+        EMBED %WindowManagerMethodCodeSection
+            [INSTANCES]
+                WHEN 'Init'
+                [INSTANCES]
+                    WHEN '(),BYTE'
+                    [DEFINITION]
+                         [SOURCE]
+                            PROPERTY:BEGIN
+                            PRIORITY 450
+                            PROPERTY:END 
+                    [END]
+                [END]
+             [END]
+        [END]
+        '''
+
+        def reader = new TxaReader('' << content)
+        reader.readLine()
+
+        def common = new Common()
+        new EmbedSectionParser(common).parse(reader)
+        assert common.embeds != null
+        assert common.embeds.size() == 3
+
     }
 }

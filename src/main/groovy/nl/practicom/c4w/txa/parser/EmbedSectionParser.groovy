@@ -8,7 +8,7 @@ class EmbedSectionParser {
     static embedPattern = /^\s*EMBED\s*(%?\w+)$/
     static priorityPattern = /^\s*PRIORITY\s+([0-9]+)\s*$/
     static instancePattern = /^\s*INSTANCE\s+([0-9]+)\s*$/
-    static whenPattern = /^\s*WHEN\s*'(\??\w+)'\s*$/
+    static whenPattern = /^\s*WHEN\s*'(\??[:\w\(\)\,]+)'\s*$/
 
     Common parent
 
@@ -30,6 +30,7 @@ class EmbedSectionParser {
             }
 
             while (!r.atEOF() && r.currentLine() ==~ embedPattern) {
+
                 def embedMatcher = (r.currentLine() =~ embedPattern)
                 def embedPoint = embedMatcher[0][1] as String
 
@@ -40,14 +41,19 @@ class EmbedSectionParser {
                 switch ( r.currentLine().asSectionMark() ){
                     case SectionMark.INSTANCES : // Note the plural form!
                         this.parseInstances(embedPoint, instanceLocation, r)
-                        break;
+                        break
 
                     case SectionMark.DEFINITION :
                         this.parseDefinitions(embedPoint, instanceLocation, r)
-                        break;
+                        break
                 }
             }
         } else {
+            r.readLine()
+        }
+
+        // Discard [END] of [EMBED]
+        if ( r.atSectionEndMark()){
             r.readLine()
         }
     }
@@ -55,9 +61,11 @@ class EmbedSectionParser {
     private void parseInstances(String embedPoint, List parentLocation, TxaReader r) {
 
         // discard [INSTANCES] marker
-        r.readLine()
+        if ( r.at(SectionMark.INSTANCES)){
+            r.readLine()
+        }
 
-        while ( !r.at(SectionMark.SECTIONEND) && r.currentLine() ==~ whenPattern){
+        while ( !r.atSectionEndMark() && r.currentLine() ==~ whenPattern){
             def instanceLocation = [] << parentLocation << parseInstanceLocation(r.currentLine())
             instanceLocation = instanceLocation.flatten()
 
@@ -71,8 +79,10 @@ class EmbedSectionParser {
             }
         }
 
-        // discard [END] of [INSTANCES]
-        r.readLine()
+        if ( r.atSectionEndMark()){
+            // discard [END] of [INSTANCES]
+            r.readLine()
+        }
     }
 
     private void parseDefinitions(String embedPoint, List instanceLocation, TxaReader r) {
@@ -80,7 +90,7 @@ class EmbedSectionParser {
 
         EmbedInstance embedInstance = null
 
-        while( !r.at(SectionMark.SECTIONEND)) {
+        while( !r.atEOF() && !r.atSectionEndMark()) {
             switch (r.currentLine().asSectionMark()) {
                 case SectionMark.SOURCE:
                     embedInstance = parseSourceDefinition(r)
@@ -94,6 +104,13 @@ class EmbedSectionParser {
                 case SectionMark.GROUP:
                     embedInstance = parseGroupDefinition(r)
                     break
+                default:
+                    println("${this.getClass().getSimpleName()}:parseDefinitions:")
+                    println("ERROR at line ${r.currentLineNumber()}, While parsing definition for embedpoint ${embedPoint}/${instanceLocation.join('/')}:")
+                    println("--> Expected [SOURCE],[GROUP],[PROCEDURE] or [TEMPLATE] but found: ${r.currentLine()} ")
+                    //r.readUptoNextSection()
+                    r.readLine()
+                    break
             }
 
             if (embedInstance != null) {
@@ -106,7 +123,9 @@ class EmbedSectionParser {
         }
 
         // discard [END] of [DEFINITION] line
-        r.readLine()
+        if ( r.atSectionEndMark()){
+            r.readLine()
+        }
     }
 
     EmbedInstance parseSourceDefinition(TxaReader r) {
@@ -145,7 +164,7 @@ class EmbedSectionParser {
         embed.procedureName = embeddedCall.substring(0,embeddedCall.indexOf('('))
         embed.procedureParams = embeddedCall.substring(embed.procedureName.length())
         embed.priority = this.parsePriority(r.readLine())
-        r.readUptoNextSection()
+        r.readUptoSectionEnd()
         return embed
     }
 
@@ -155,7 +174,7 @@ class EmbedSectionParser {
         // Assumption: priority and instance generated in fixed sequence!
         embed.priority = parsePriority(r.readLine())
         embed.instanceId = parseInstanceId(r.readLine())
-        r.readUptoNextSection()
+        r.readUptoSectionEnd()
         return embed
     }
 

@@ -23,13 +23,18 @@ class AdditionSectionParser {
             reader.readUptoSection(SectionMark.ADDITION)
         }
 
-        if (!reader.atEOF()){
+        // Only when there's a [ADDITION] section it will be initialize
+        if ( reader.at(SectionMark.ADDITION)){
+            this.parent.additions= []
+        }
+
+        while ( !reader.atEOF() && reader.at(SectionMark.ADDITION)){
             def addition = new Addition()
 
             reader.readLine()
 
             def nameMatcher = (reader.currentLine() =~ namePattern)
-            if ( nameMatcher.matches() ){
+            if (nameMatcher.matches()) {
                 addition.templateClass = nameMatcher[0][1]
                 addition.templateName = nameMatcher[0][2]
             }
@@ -37,8 +42,8 @@ class AdditionSectionParser {
             reader.readUptoNextSection()
 
             // keep processing any sections
-            while( !reader.atEOF() && reader.atAnySectionStart() && !reader.at(SectionMark.ADDITION)){
-                switch(reader.currentLine().asSectionMark()){
+            while (!reader.atEOF() && reader.atAnySectionStart() && !reader.at(SectionMark.ADDITION)) {
+                switch (reader.currentLine().asSectionMark()) {
                     case SectionMark.FIELDPROMPT:
                         parseFieldPrompts(addition, reader)
                         break
@@ -48,11 +53,13 @@ class AdditionSectionParser {
                     case SectionMark.PROMPTS:
                         parsePrompts(addition, reader)
                         break
+                    case SectionMark.ADDITION:
+                        //Implicit end of current addition section
+                        break
                 }
             }
-            this.parent.additions = [addition]
 
-            reader.readUptoNextSection()
+            this.parent.additions.add(addition)
         }
     }
 
