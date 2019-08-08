@@ -6,42 +6,55 @@ package nl.practicom.c4w.txa.parser
  * for more robustness although in the TXA no whitespace seems to be generated.
  */
 enum SectionMark {
-    ADDITION("[ADDITION]",/^\s*\[ADDITION\]\s*$/),
-    APPLICATION("[APPLICATION]",/^\s*\[APPLICATION\\]\s*$/),
-    CALLS("[CALLS]",/^\s*\[CALLS\]\s*$/),
-    COMMON("[COMMON]",/^\s*\[COMMON\]\s*$/),
-    DATA("[DATA]",/^\s*\[DATA\]\s*$/),
-    DEFINITION("[DEFINITION]",/^\s*\[DEFINITION\]\s*$/),
-    EMBED("[EMBED]",/^\s*\[EMBED\]\s*$/),
-    FIELDPROMPT("[FIELDPROMPT]",/^\s*\[FIELDPROMPT\]\s*$/),
-    FILES("[FILES]",/^\s*\[FILES\]\s*$/),
-    FORM("[FORM]",/^\s*\[FORM\]\s*$/),
-    FORMULA("[FORMULA]",/^\s*\[FORMULA\]\s*$/),
-    GROUP("[GROUP]", /^\s*\[GROUP\]\s*$/),
-    INSTANCE("[INSTANCE]",/^\s*\[INSTANCE\]\s*$/),
-    INSTANCES("[INSTANCES]",/^\s*\[INSTANCES\]\s*$/),
-    KEY("[KEY]",/^\s*\[KEY\]\s*$/),
-    MODULE("[MODULE",/^\s*\[MODULE\]\s*$/),
-    OTHERS("[OTHERS]",/^\s*\[OTHERS\]\s*$/),
-    PRIMARY("[PRIMARY]",/^\s*\[PRIMARY\]\s*$/),
-    PROCEDURE("[PROCEDURE]",/^\[PROCEDURE\]\s*$/),
-    PROGRAM("[PROGRAM]",/^\s*\[PROGRAM\\]\s*$/),
-    PROMPTS("[PROMPTS]",/^\s*\[PROMPTS\]$/),
-    REPORT("[REPORT]",/^\s*\[REPORT\]\s*$/),
-    REPORTCONTROLS("[REPORTCONTROLS]",/^\s*\[REPORTCONTROLS\]\s*$/),
-    SECONDARY("[SECONDARY]",/^\s*\[SECONDARY\]\s*$/),
-    SECTIONEND("[END]",/^\s*\[END\]\s*$/),
-    SCREENCONTROLS("[SCREENCONTROLS]",/^\s*\[SCREENCONTROLS\]\s*$/),
-    SOURCE("[SOURCE]", /^\s*\[SOURCE\]\s*$/),
-    TEMPLATE("[TEMPLATE]", /^\s*\[TEMPLATE\]\s*$/),
-    WINDOW("[WINDOW]",/^\s*\[WINDOW\]\s*$/)
+    ADDITION, APPLICATION, CALLS, COMMON, DATA, DEFINITION, EMBED, FIELDPROMPT, FILES, FORM, FORMULA, GROUP,
+    INSTANCE, INSTANCES, KEY, LONGDESC, MODULE, OTHERS, PERSIST, PRIMARY, PROCEDURE, PROGRAM, PROJECT,
+    PROMPTS, REPORT, REPORTCONTROLS, SECONDARY, END, SCREENCONTROLS, SOURCE, TEMPLATE, USEROPTION, WINDOW
+
+    static requiresExplicitEnd = [PROGRAM, MODULE, EMBED, INSTANCES, DEFINITION]
+
+    final static EnumMap<SectionMark,List<SectionMark>> childSections =
+            [
+                    (APPLICATION): [PROGRAM, PROJECT, MODULE, COMMON, PERSIST],
+                    (PROGRAM)    : [COMMON],
+                    (PROJECT)    : [],
+                    (MODULE)     : [COMMON, PROCEDURE],
+                    (PROCEDURE)  : [COMMON, CALLS, WINDOW, REPORT, FORM, FORMULA],
+                    (COMMON)     : [DATA, FILES, PROMPTS, EMBED, ADDITION],
+                    (DATA)       : [LONGDESC, USEROPTION, SCREENCONTROLS, REPORTCONTROLS],
+                    (FILES)      : [PRIMARY, OTHERS],
+                    (PRIMARY)    : [INSTANCE, KEY, SECONDARY],
+                    (PROMPTS)    : [],
+                    (EMBED)      : [INSTANCES, DEFINITION],
+                    (INSTANCES)  : [INSTANCES, DEFINITION],
+                    (DEFINITION) : [SOURCE, GROUP, PROCEDURE, TEMPLATE],
+                    (ADDITION)   : [FIELDPROMPT, INSTANCE, PROMPTS]
+            ]
+
+    static boolean isSectionMark(String s){
+        s== null ? false : s ==~ /^\s*\[[A-Z]+\]\s*$/
+    }
 
     def tag
     def matcher
 
-    SectionMark(tag, matcher) {
-        this.tag = tag
-        this.matcher = matcher
+    SectionMark(tag=null, matcher=null) {
+        this.tag = tag != null ? tag : "[${this.name() as String}]"
+        this.matcher = matcher != null ? matcher : /^\s*\[${this.name()}\]\s*$/
+    }
+
+    def hasChild(SectionMark other){
+        if ( other == null ){
+            return false
+        }
+        def children = SectionMark.childSections.get(this)
+        if ( children == null || children.isEmpty()){
+            return false
+        }
+        return children.contains(other)
+    }
+
+    def requiresExplicitEnd(){
+        requiresExplicitEnd.contains(this)
     }
 
     @Override

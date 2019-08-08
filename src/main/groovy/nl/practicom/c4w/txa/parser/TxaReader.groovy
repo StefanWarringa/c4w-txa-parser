@@ -1,6 +1,7 @@
 package nl.practicom.c4w.txa.parser
 
 import java.nio.file.Paths
+import static nl.practicom.c4w.txa.parser.SectionMark.*
 
 /**
  * The TXA reader is a forward-only scanner for TXA files
@@ -10,7 +11,7 @@ import java.nio.file.Paths
  */
 class TxaReader {
 
-    private static anySectionMarkPattern = /^\s*\[.+\]\s*$/
+    private final static anySectionMarkPattern = /^\s*\[.+\]\s*$/
 
     // The raw text reader
     private Reader _source
@@ -181,6 +182,6 @@ class TxaReader {
     }
 
     boolean atSectionEndMark(){
-        this.at(SectionMark.SECTIONEND)
+        this.at(END)
     }
 }
