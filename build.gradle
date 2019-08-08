@@ -1,6 +1,7 @@
 plugins {
     id 'groovy'
     id 'ivy-publish'
+    id 'idea'
 }
 
 group 'nl.practicom'
