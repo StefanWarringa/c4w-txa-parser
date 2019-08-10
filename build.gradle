@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'nl.practicom'
-version '1.0-SNAPSHOT'
+version '0.1'
 
 repositories {
     mavenCentral()
@@ -18,6 +18,15 @@ dependencies {
 }
 
 publishing {
+    repositories {
+        ivy {
+            url project.property('publishing.repo.url')
+            patternLayout {
+                artifact "[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"
+                ivy "[organisation]/[module]/ivy-[revision].[ext]"
+            }
+        }
+    }
     publications {
         ivy(IvyPublication) {
             organisation = 'nl.practicom'
