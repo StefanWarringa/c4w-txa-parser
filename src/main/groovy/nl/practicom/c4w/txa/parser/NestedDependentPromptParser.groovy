@@ -1,6 +1,7 @@
 package nl.practicom.c4w.txa.parser
 
 import nl.practicom.c4w.txa.model.TemplatePrompts
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class NestedDependentPromptParser {
     TemplatePrompts parent

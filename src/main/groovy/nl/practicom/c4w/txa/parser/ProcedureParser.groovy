@@ -2,6 +2,8 @@ package nl.practicom.c4w.txa.parser
 
 import nl.practicom.c4w.txa.model.Procedure
 import nl.practicom.c4w.txa.model.TxaRoot
+import nl.practicom.c4w.txa.transform.SectionMark
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class ProcedureParser {
     static TxaRoot parse(TxaReader r) {

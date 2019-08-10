@@ -1,7 +1,4 @@
 package nl.practicom.c4w.txa.transform
-
-import nl.practicom.c4w.txa.parser.SectionMark
-
 /**
  * This class stores context the hierarchical context
  * of the current line in the TXA structure.

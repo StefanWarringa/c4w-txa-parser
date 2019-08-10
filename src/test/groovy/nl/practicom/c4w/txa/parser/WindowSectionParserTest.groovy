@@ -3,6 +3,7 @@ package nl.practicom.c4w.txa.parser
 import nl.practicom.c4w.txa.meta.ClarionStringMixins
 import nl.practicom.c4w.txa.model.Procedure
 import nl.practicom.c4w.txa.model.Window
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class WindowSectionParserTest extends GroovyTestCase {
     void setUp() {

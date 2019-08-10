@@ -3,6 +3,8 @@ package nl.practicom.c4w.txa.parser
 import nl.practicom.c4w.txa.model.Common
 import nl.practicom.c4w.txa.model.TemplatePrompts
 import nl.practicom.c4w.txa.model.TxaRoot
+import nl.practicom.c4w.txa.transform.SectionMark
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class CommonSectionParser {
     private TxaRoot parent

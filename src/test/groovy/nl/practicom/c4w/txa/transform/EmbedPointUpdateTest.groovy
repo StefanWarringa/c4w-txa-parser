@@ -1,8 +1,8 @@
 package nl.practicom.c4w.txa.transform
 
-import nl.practicom.c4w.txa.TxaTestSupport
-import nl.practicom.c4w.txa.parser.SectionMark
-import static nl.practicom.c4w.txa.parser.SectionMark.*
+import nl.practicom.c4w.txa.test.TxaTestSupport
+
+import static SectionMark.*
 
 class EmbedPointUpdateTest extends GroovyTestCase implements TxaTestSupport {
 

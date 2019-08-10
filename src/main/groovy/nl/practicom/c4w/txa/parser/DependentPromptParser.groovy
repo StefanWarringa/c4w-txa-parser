@@ -3,6 +3,7 @@ package nl.practicom.c4w.txa.parser
 import nl.practicom.c4w.txa.model.DependentPrompt
 import nl.practicom.c4w.txa.model.Prompt
 import nl.practicom.c4w.txa.model.TemplatePrompts
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class DependentPromptParser {
     TemplatePrompts parent

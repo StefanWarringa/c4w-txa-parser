@@ -4,12 +4,12 @@ import groovy.transform.PackageScope
 import nl.practicom.c4w.txa.meta.ClarionDateMixins
 
 import java.nio.file.Paths
-import nl.practicom.c4w.txa.parser.SectionMark
+
 import nl.practicom.c4w.txa.meta.ClarionStringMixins
 
 import java.util.regex.Matcher
 
-import static nl.practicom.c4w.txa.parser.SectionMark.*
+import static SectionMark.*
 
 /**
  * Extracts specific content from a txa file
@@ -41,6 +41,11 @@ class StreamingTxaReader {
 
     def registerHandler(TxaContentHandler handler){
         handlers.push(handler)
+    }
+
+    StreamingTxaReader withHandler(TxaContentHandler... handlers){
+        handlers.each { h -> this.registerHandler(h)}
+        return this
     }
 
     /**
@@ -134,7 +139,6 @@ class StreamingTxaReader {
      */
     private void processLine(TxaContext ctx){
         final NAME_DECL = ~/^NAME\s+(.*)\s*$/
-        final TEMPLATE_DECL = ~/^FROM\s+(\w[\w\s]+)\s*$/
 
         if (!ctx.currentProcedureName && ctx.currentSection == PROCEDURE && !ctx.parentSections.contains(DEFINITION)){
             (ctx.currentLine =~ NAME_DECL).each {

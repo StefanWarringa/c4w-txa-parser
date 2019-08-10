@@ -2,6 +2,8 @@ package nl.practicom.c4w.txa.parser
 
 import nl.practicom.c4w.txa.model.Common
 import nl.practicom.c4w.txa.model.ControlTemplateFiles
+import nl.practicom.c4w.txa.transform.SectionMark
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class ControlTemplateFilesParser {
     Common parent

@@ -1,7 +1,7 @@
-package nl.practicom.c4w.txa
+package nl.practicom.c4w.txa.test
 
-import nl.practicom.c4w.txa.parser.SectionMark
-import nl.practicom.c4w.txa.transform.ProcedureExtractor
+import nl.practicom.c4w.txa.transform.SectionMark
+
 import nl.practicom.c4w.txa.transform.StreamingTxaReader
 import nl.practicom.c4w.txa.transform.TxaContentHandler
 import nl.practicom.c4w.txa.transform.TxaContext
@@ -10,24 +10,20 @@ import java.nio.file.Paths
 
 trait TxaTestSupport {
 
-    def assertStructuresAtLine(ProcedureExtractor.Procedure p, int lineno, List<String>... structures){
+    def assertStructuresAtLine(String content, int lineno, List<String>... structures){
         def n = lineno
         for (s in structures){
-            assertStructureAtLine(p, n, s)
+            assertStructureAtLine(content, n, s)
             n += s.size()
         }
     }
 
-    def assertStructureAtLine(ProcedureExtractor.Procedure p, int lineno, structure){
-        def lines = p.body.toString().toLineArray()
+    def assertStructureAtLine(String content, int lineno, structure){
+        def lines = content.toLineArray()
         assert lines.size() > 0
         assert lines.size() >= lineno + structure.size()
         def bodySection = lines[lineno..lineno+structure.size()-1]
         assert bodySection*.trim() == structure*.trim()
-    }
-
-    def assertSectionsClosedCorrectly(ProcedureExtractor.Procedure p) {
-        assertSectionsClosedCorrectly(p.body.toString())
     }
 
     def assertSectionsClosedCorrectly(String s){
@@ -45,8 +41,8 @@ trait TxaTestSupport {
         assert level == 0
     }
 
-    def assertAllSectionsWithoutIndents(ProcedureExtractor.Procedure p){
-        def unalignedSections = p.body.toString().toLineArray().findAll { it ==~ /^\s+\[[A-Z]+\]\s*$/}
+    def assertAllSectionsWithoutIndents(String content){
+        def unalignedSections = content.toLineArray().findAll { it ==~ /^\s+\[[A-Z]+\]\s*$/}
         assert unalignedSections.size() == 0
     }
 

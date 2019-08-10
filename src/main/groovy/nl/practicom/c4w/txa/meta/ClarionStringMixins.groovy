@@ -1,7 +1,7 @@
 package nl.practicom.c4w.txa.meta
 
-import nl.practicom.c4w.txa.parser.SectionMark
-import static nl.practicom.c4w.txa.parser.SectionMark.*
+import nl.practicom.c4w.txa.transform.SectionMark
+import static nl.practicom.c4w.txa.transform.SectionMark.*
 
 class ClarionStringMixins {
 

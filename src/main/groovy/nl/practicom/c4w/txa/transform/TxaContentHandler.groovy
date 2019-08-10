@@ -1,7 +1,5 @@
 package nl.practicom.c4w.txa.transform
 
-import nl.practicom.c4w.txa.parser.SectionMark
-
 interface TxaContentHandler {
 
     /**

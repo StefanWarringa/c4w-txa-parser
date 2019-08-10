@@ -1,9 +1,8 @@
 package nl.practicom.c4w.txa.transform
 
-import nl.practicom.c4w.txa.TxaTestSupport
-import static nl.practicom.c4w.txa.TxaTestSupport.*
-
-import static nl.practicom.c4w.txa.parser.SectionMark.*
+import nl.practicom.c4w.txa.test.TxaTestSupport
+import static nl.practicom.c4w.txa.test.TxaTestSupport.*
+import static nl.practicom.c4w.txa.transform.SectionMark.*
 
 class SectionTreeRollupTest extends GroovyTestCase implements TxaTestSupport {
 

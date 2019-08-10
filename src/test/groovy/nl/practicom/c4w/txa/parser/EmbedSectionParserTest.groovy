@@ -3,6 +3,7 @@ package nl.practicom.c4w.txa.parser
 import nl.practicom.c4w.txa.meta.ClarionStringMixins
 import nl.practicom.c4w.txa.model.Common
 import nl.practicom.c4w.txa.model.EmbedInstance
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class EmbedSectionParserTest extends GroovyTestCase {
 

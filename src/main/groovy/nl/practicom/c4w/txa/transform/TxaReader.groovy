@@ -1,7 +1,8 @@
-package nl.practicom.c4w.txa.parser
+package nl.practicom.c4w.txa.transform
+
 
 import java.nio.file.Paths
-import static nl.practicom.c4w.txa.parser.SectionMark.*
+import static SectionMark.*
 
 /**
  * The TXA reader is a forward-only scanner for TXA files

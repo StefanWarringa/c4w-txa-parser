@@ -1,13 +1,11 @@
 package nl.practicom.c4w.txa.transform
 
-import nl.practicom.c4w.txa.TxaTestSupport
+import nl.practicom.c4w.txa.test.TxaTestSupport
 import nl.practicom.c4w.txa.meta.ClarionDateMixins
 import nl.practicom.c4w.txa.meta.ClarionStringMixins
 
-import static nl.practicom.c4w.txa.TxaTestSupport.*
-
-import  nl.practicom.c4w.txa.parser.SectionMark
-import static nl.practicom.c4w.txa.parser.SectionMark.*
+import static nl.practicom.c4w.txa.test.TxaTestSupport.*
+import static nl.practicom.c4w.txa.transform.SectionMark.*
 
 class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
 

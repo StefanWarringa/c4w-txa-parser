@@ -5,6 +5,7 @@ import nl.practicom.c4w.txa.model.Addition
 import nl.practicom.c4w.txa.model.Common
 import nl.practicom.c4w.txa.model.DependentPrompt
 import nl.practicom.c4w.txa.model.Prompt
+import nl.practicom.c4w.txa.transform.TxaReader
 
 class AdditionSectionParserTest extends GroovyTestCase {
     void setUp() {

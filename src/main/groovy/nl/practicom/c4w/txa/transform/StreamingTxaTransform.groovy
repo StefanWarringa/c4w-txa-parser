@@ -1,9 +1,9 @@
 package nl.practicom.c4w.txa.transform
 
-import nl.practicom.c4w.txa.parser.SectionMark
+
 import org.codehaus.groovy.runtime.StringBufferWriter
 
-import static nl.practicom.c4w.txa.parser.SectionMark.END
+import static SectionMark.END
 
 class StreamingTxaTransform implements TxaContentHandler {
 
