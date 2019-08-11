@@ -4,7 +4,10 @@ import nl.practicom.c4w.txa.transform.SectionMark
 
 import nl.practicom.c4w.txa.transform.StreamingTxaReader
 import nl.practicom.c4w.txa.transform.TxaContentHandler
+import nl.practicom.c4w.txa.transform.TxaRawContentHandler
 import nl.practicom.c4w.txa.transform.TxaContext
+import nl.practicom.c4w.txa.transform.TxaLogicalContentHandler
+import nl.practicom.c4w.txa.transform.TxaSectionHandler
 
 import java.nio.file.Paths
 
@@ -61,15 +64,14 @@ trait TxaTestSupport {
         [reader, h, ctx]
     }
 
-    static class TxaContentHandlerStub implements TxaContentHandler {
+    static class TxaContentHandlerStub implements TxaContentHandler, TxaSectionHandler, TxaRawContentHandler, TxaLogicalContentHandler {
         def sectionsStarted = []
         def sectionsClosed = []
-        def sectionContents = [:]
+        def rawContents = [:]
+        def logicalContents = [:]
 
         @Override
-        void onProcessingStart(TxaContext context) {
-
-        }
+        void onProcessingStart(TxaContext context) {}
 
         @Override
         void onSectionStart(TxaContext context, SectionMark section) {
@@ -78,10 +80,18 @@ trait TxaTestSupport {
 
         @Override
         void onSectionContent(TxaContext context, SectionMark section, String content) {
-            if ( !sectionContents.containsKey(section)){
-                sectionContents.put(section,[])
+            if ( !rawContents.containsKey(section)){
+                rawContents.put(section,[])
             }
-            sectionContents[section] << content
+            rawContents[section] << content
+        }
+
+        @Override
+        void onSectionContent(TxaContext context, SectionMark section, Long logicalLineNo, String content) {
+            if ( !logicalContents.containsKey(section)){
+                logicalContents.put(section,[])
+            }
+            logicalContents[section] << content
         }
 
         @Override
@@ -89,9 +99,6 @@ trait TxaTestSupport {
             sectionsClosed << section
         }
 
-        @Override
-        void onProcessingFinished(TxaContext context) {
-
-        }
+        void onProcessingFinished(TxaContext context) {}
     }
 }

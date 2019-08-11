@@ -5,7 +5,7 @@ import org.codehaus.groovy.runtime.StringBufferWriter
 
 import static SectionMark.END
 
-class StreamingTxaTransform implements TxaContentHandler {
+class StreamingTxaTransform implements TxaContentHandler, TxaSectionHandler, TxaRawContentHandler {
 
     final static String EOL = System.lineSeparator()
 

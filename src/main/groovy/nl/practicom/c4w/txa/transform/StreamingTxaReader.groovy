@@ -16,12 +16,19 @@ import static SectionMark.*
  */
 class StreamingTxaReader {
     private Reader source
+    private LineBuilder lineBuilder
 
-    private List<TxaContentHandler> handlers = []
+    private List<TxaSectionHandler> sectionHandlers = []
+    private List<TxaRawContentHandler> rawHandlers = []
+    private List<TxaLogicalContentHandler> logicalHandlers = []
 
     static {
         ClarionStringMixins.initialize()
         ClarionDateMixins.initialize()
+    }
+
+    StreamingTxaReader(){
+       lineBuilder = new LineBuilder()
     }
 
     def parse(String txaFile){
@@ -40,7 +47,17 @@ class StreamingTxaReader {
     }
 
     def registerHandler(TxaContentHandler handler){
-        handlers.push(handler)
+        if (handler instanceof TxaLogicalContentHandler){
+            logicalHandlers.push(handler as TxaLogicalContentHandler)
+        }
+
+        if (handler instanceof  TxaRawContentHandler){
+            rawHandlers.push(handler as TxaRawContentHandler)
+        }
+
+        if ( handler instanceof TxaSectionHandler) {
+            sectionHandlers.push(handler as TxaSectionHandler)
+        }
     }
 
     StreamingTxaReader withHandler(TxaContentHandler... handlers){
@@ -55,7 +72,7 @@ class StreamingTxaReader {
      */
     private void doParse() {
 
-        if ( handlers.isEmpty()) return
+        if (sectionHandlers.isEmpty() && rawHandlers.isEmpty() && logicalHandlers.isEmpty()) return
 
         def ctx = new TxaContext()
 
@@ -68,27 +85,12 @@ class StreamingTxaReader {
             ctx.currentLine = line
 
             if ( line.isSectionMark()){
-                if ( line.isSectionEnd() ){
-                    rollupSectionTree(ctx, END)
-                    if ( !ctx.parentSections.isEmpty()){
-                        ctx.currentSection = ctx.parentSections.pop()
-                    }
-                } else {
-                    SectionMark section = line.asSectionMark()
-                    if ( ctx.currentSection != null) {
-                        if ( ctx.currentSection.hasChild(section)) {
-                            ctx.parentSections.push(ctx.currentSection)
-                        } else {
-                            // Roll up to the parent section for this section marker
-                            rollupSectionTree(ctx, section)
-                        }
-                    }
-
-                    processSectionStart(ctx, section)
-                    ctx.currentSection = section
-                }
+                processSection(ctx, line.asSectionMark())
             } else {
-                processLine(ctx)
+                lineBuilder.accept(line, ctx.currentLineNumber,
+                { _, rawLine -> processRawLine(ctx) },
+                { logicalLineNo, logicalLine -> processLogicalLine(ctx, logicalLineNo, logicalLine) }
+                )
             }
         }
 
@@ -102,6 +104,26 @@ class StreamingTxaReader {
         }
     }
 
+    private void processSection(TxaContext ctx, SectionMark section){
+        if ( section == END ){
+            rollupSectionTree(ctx, END)
+            if ( !ctx.parentSections.isEmpty()){
+                ctx.currentSection = ctx.parentSections.pop()
+            }
+        } else {
+            if ( ctx.currentSection != null) {
+                if ( ctx.currentSection.hasChild(section)) {
+                    ctx.parentSections.push(ctx.currentSection)
+                } else {
+                    // Roll up to the parent section for this section marker
+                    rollupSectionTree(ctx, section)
+                }
+            }
+
+            processSectionStart(ctx, section)
+            ctx.currentSection = section
+        }
+    }
     /**
      * Handles the start of a new section, notifying handlers so they can
      * perform their processing logic. This method will be called just before
@@ -115,7 +137,7 @@ class StreamingTxaReader {
         if ( isProcedureDeclaration(ctx, section)){
             ctx.currentProcedureName = null
         }
-        handlers.each { h -> h.onSectionStart(ctx, section)}
+        sectionHandlers.each { h -> h.onSectionStart(ctx, section)}
     }
 
     /**
@@ -129,15 +151,15 @@ class StreamingTxaReader {
      */
     private void processSectionEnd(TxaContext ctx, SectionMark section){
         updateEmbedPointInfo(ctx)
-        handlers.each { h -> h.onSectionEnd(ctx, section)}
+        sectionHandlers.each { h -> h.onSectionEnd(ctx, section)}
     }
 
     /**
-     * Handles the processing of a line of content within the current section.
+     * Handles the processing of a raw line of content within the current section.
      *
      * @param ctx
      */
-    private void processLine(TxaContext ctx){
+    private void processRawLine(TxaContext ctx){
         final NAME_DECL = ~/^NAME\s+(.*)\s*$/
 
         if (!ctx.currentProcedureName && ctx.currentSection == PROCEDURE && !ctx.parentSections.contains(DEFINITION)){
@@ -150,7 +172,19 @@ class StreamingTxaReader {
             updateEmbedPointInfo(ctx)
         }
 
-        handlers.each {h -> h.onSectionContent(ctx, ctx.currentSection, ctx.currentLine)}
+        rawHandlers.each { h -> h.onSectionContent(ctx, ctx.currentSection, ctx.currentLine)}
+    }
+
+    /**
+     * Processes a single logical line of content. This will merely dispatch the logical line
+     * contents to the logical content handlers.
+     * @param ctx - current processing context. Context will contain the current physical line
+     *              and physical line number
+     * @param logicalLineNr - the logical line number
+     * @param logicalLine - the logical line contents
+     */
+    private void processLogicalLine (TxaContext ctx, logicalLineNr, logicalLine){
+        logicalHandlers.each { h -> h.onSectionContent(ctx, ctx.currentSection, logicalLineNr, logicalLine)}
     }
 
     /* Check if current section mark starts a procedure declaration */
