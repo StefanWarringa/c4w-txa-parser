@@ -101,7 +101,7 @@ class LineBuilderTest extends GroovyTestCase {
                 "AppFrame APPLICATION('INkoop VERkoop VOorraad')",
                 "MENUBAR,USE(?MENUBAR1),#ORDINAL(1)",
                 "ITEM('Aanmelden'),USE(?Aanmelden),#ORDINAL(1)",
-                "MENU('Groothandel bestellingen'),USE(?VerkopenModembestellingen),MSG('Inlezen, p' & 'rinten en verwerking van modembestellingen'),#ORDINAL(22)",
+                "MENU('Groothandel bestellingen'),USE(?VerkopenModembestellingen),MSG('Inlezen, printen en verwerking van modembestellingen'),#ORDINAL(22)",
                 "ITEM('Opdrachtbevestigingen aanmaken'),USE(?OpdrachtbevestigingenAanmaken), #ORDINAL(2)",
                 "END",
                 "END"
