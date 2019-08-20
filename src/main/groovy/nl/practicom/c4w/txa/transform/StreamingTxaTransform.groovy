@@ -17,7 +17,7 @@ class StreamingTxaTransform implements TxaContentHandler, TxaSectionHandler, Txa
 
     @Override
    void onProcessingStart(TxaContext context) {
-        writer = new StringBufferWriter()
+        writer = new StringBufferWriter('' << '')
         transformInitialize(context)
     }
 
@@ -32,7 +32,7 @@ class StreamingTxaTransform implements TxaContentHandler, TxaSectionHandler, Txa
     @Override
     void onSectionContent(TxaContext context, SectionMark section, String content) {
         def transformedContent = this.transformSectionContent(context, section, content)
-        if ( content != null ){
+        if ( transformedContent != null ){
             writer << transformedContent << EOL
         }
     }
@@ -56,7 +56,7 @@ class StreamingTxaTransform implements TxaContentHandler, TxaSectionHandler, Txa
 
     protected String getContent(){
         writer.flush()
-        return writer.toString()
+        return writer.toString() ?: ''
     }
 
     protected void clear(){
