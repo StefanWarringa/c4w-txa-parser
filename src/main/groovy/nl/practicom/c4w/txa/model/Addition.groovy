@@ -37,7 +37,7 @@ package nl.practicom.c4w.txa.model
  *        PARENT 3
  *        .
  */
-class Addition implements TemplatePrompts {
+class Addition extends TemplatePrompts {
 
     /**
      * Identifies the template class and the specific template invoked (required).

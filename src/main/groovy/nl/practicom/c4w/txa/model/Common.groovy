@@ -1,6 +1,6 @@
 package nl.practicom.c4w.txa.model
 
-class Common implements TemplatePrompts {
+class Common extends TemplatePrompts {
 
     /**
      * Up to 40 characters of text describing the application, program, module, or procedure (optional).

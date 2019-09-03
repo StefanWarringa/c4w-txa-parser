@@ -8,7 +8,7 @@ package nl.practicom.c4w.txa.model
  *     %UpdateProcedure PROCEDURE  (UpdatePhones)
  *     %EditViaPopup LONG  (1)
  */
-trait TemplatePrompts {
+abstract class TemplatePrompts {
 
     List<Prompt> prompts
 

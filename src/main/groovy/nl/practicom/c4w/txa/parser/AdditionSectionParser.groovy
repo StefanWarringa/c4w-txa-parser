@@ -2,7 +2,6 @@ package nl.practicom.c4w.txa.parser
 
 import nl.practicom.c4w.txa.model.Addition
 import nl.practicom.c4w.txa.model.Common
-import nl.practicom.c4w.txa.model.TemplatePrompts
 import nl.practicom.c4w.txa.transform.SectionMark
 import nl.practicom.c4w.txa.transform.TxaReader
 
@@ -70,9 +69,7 @@ class AdditionSectionParser {
         // of the model object. Therefore we create a simple object
         // and add the prompts to via the trait it so we can pass
         // it to the parser
-        def dummy = new Object() as TemplatePrompts
-        new PromptsSectionParser(dummy).parse(r, SectionMark.FIELDPROMPT)
-        addition.fieldPrompts = dummy.prompts
+        new PromptsSectionParser(addition).parse(r, SectionMark.FIELDPROMPT)
     }
 
     def parsePrompts(Addition addition, TxaReader r) {
