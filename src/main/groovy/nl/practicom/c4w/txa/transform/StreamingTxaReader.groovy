@@ -46,6 +46,11 @@ class StreamingTxaReader {
         doParse()
     }
 
+    def parse(InputStream txaInputStream){
+        this.source = txaInputStream.newReader()
+        doParse()
+    }
+
     def registerHandler(TxaContentHandler handler){
         if (handler instanceof TxaLogicalContentHandler){
             logicalHandlers.push(handler as TxaLogicalContentHandler)
