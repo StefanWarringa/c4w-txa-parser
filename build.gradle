@@ -30,7 +30,7 @@ publishing {
         ivy(IvyPublication) {
             organisation = 'nl.practicom'
             module = 'c4w-txa'
-            revision = '0.1'
+            revision = version
             descriptor.status = 'milestone'
             descriptor.branch = 'testing'
 
