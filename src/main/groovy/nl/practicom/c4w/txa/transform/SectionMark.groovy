@@ -34,7 +34,7 @@ enum SectionMark {
             ]
 
     static boolean isSectionMark(String s){
-        s== null ? false : s ==~ /^\s*\[[A-Z]+\]\s*$/
+        s== null ? false : s ==~ /^\s*\[[A-Z]+]\s*$/
     }
 
     def tag
