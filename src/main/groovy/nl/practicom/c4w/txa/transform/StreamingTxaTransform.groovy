@@ -55,7 +55,9 @@ class StreamingTxaTransform implements TxaContentHandler, TxaSectionHandler, Txa
 
   @Override
   void onProcessingStart(TxaContext context) {
-    writer = new StringBufferWriter('' << '')
+    if ( writer == null) {
+      writer = new StringBufferWriter('' << '')
+    }
     transformInitialize(context)
   }
 
@@ -89,6 +91,7 @@ class StreamingTxaTransform implements TxaContentHandler, TxaSectionHandler, Txa
     if ( content != null ){
       writer << content << EOL
     }
+    writer.flush()
     writer.close()
   }
 

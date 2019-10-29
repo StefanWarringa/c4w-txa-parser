@@ -18,6 +18,7 @@ class StreamingTxaReader {
     private Reader source
     private LineBuilder lineBuilder
 
+    private List<TxaContentHandler> contentHandlers = []
     private List<TxaSectionHandler> sectionHandlers = []
     private List<TxaRawContentHandler> rawHandlers = []
     private List<TxaLogicalContentHandler> logicalHandlers = []
@@ -52,6 +53,8 @@ class StreamingTxaReader {
     }
 
     def registerHandler(TxaContentHandler handler){
+        contentHandlers.push(handler)
+
         if (handler instanceof TxaLogicalContentHandler){
             logicalHandlers.push(handler as TxaLogicalContentHandler)
         }
@@ -81,6 +84,8 @@ class StreamingTxaReader {
 
         def ctx = new TxaContext()
 
+        contentHandlers.each {h -> h.onProcessingStart(ctx)}
+
         // Current line number being read
         def lnr = 0
 
@@ -107,6 +112,8 @@ class StreamingTxaReader {
             def s = ctx.parentSections.pop()
             processSectionEnd(ctx, s)
         }
+
+        contentHandlers.each {h -> h.onProcessingFinished(ctx)}
     }
 
     private void processSection(TxaContext ctx, SectionMark section){
@@ -139,7 +146,7 @@ class StreamingTxaReader {
      */
     private void processSectionStart(TxaContext ctx, SectionMark section){
         updateEmbedPointInfo(ctx)
-        if ( isProcedureDeclaration(ctx, section)){
+        if ( ctx.isProcedureDeclaration(section)){
             ctx.currentProcedureName = null
         }
         sectionHandlers.each { h -> h.onSectionStart(ctx, section)}
@@ -190,11 +197,6 @@ class StreamingTxaReader {
      */
     private void processLogicalLine (TxaContext ctx, logicalLineNr, logicalLine){
         logicalHandlers.each { h -> h.onSectionContent(ctx, ctx.currentSection, logicalLineNr, logicalLine)}
-    }
-
-    /* Check if current section mark starts a procedure declaration */
-    def isProcedureDeclaration(TxaContext context, SectionMark section) {
-        section == PROCEDURE && !context.within(DEFINITION)
     }
 
     /**

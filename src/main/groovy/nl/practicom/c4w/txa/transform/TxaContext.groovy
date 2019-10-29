@@ -46,4 +46,8 @@ final class TxaContext {
         }
         return true
     }
+
+    boolean isProcedureDeclaration(SectionMark section) {
+        section == SectionMark.PROCEDURE && !this.within(SectionMark.DEFINITION)
+    }
 }
