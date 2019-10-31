@@ -90,9 +90,9 @@ class LineBuilderTest extends GroovyTestCase {
                               #ORDINAL(2)
                         END
                       END\
-        """.trimLines()
+        """.trimLines('\n')
 
-        content.split(System.lineSeparator()).each { line ->
+        content.split('\n').each { line ->
             lineBuilder.accept(line,rawHandler,logicalHandler)
         }
 
@@ -107,6 +107,6 @@ class LineBuilderTest extends GroovyTestCase {
                 "END"
         ]
 
-        assert rawLines == content.split(System.lineSeparator())
+        assert rawLines == content.split('\n')
     }
 }

@@ -61,21 +61,21 @@ class ClarionStringMixins {
         return s.replace('(','').replace(')','').split(',')
     }
 
-    static trimLines(String s){
-        s.toLineArray()*.trim().join(System.lineSeparator())
+    static trimLines(String s, String eol = System.lineSeparator()){
+        s.toLineArray(eol)*.trim().join(eol)
     }
 
-    static List<String> toLineArray(String s){
-        s == null ? [] : s.split(System.lineSeparator())
+    static List<String> toLineArray(String s, String eol = System.lineSeparator()){
+        s == null ? [] : s.split(eol)
     }
 
-    static trimEOL(String s){
+    static trimEOL(String s, String eol = System.lineSeparator()){
         def content = '' << s.reverse()
         // On windoze EOL is 2 chars: \cr\lf!
-        def EOL = System.lineSeparator().reverse()
+        def leo = eol.reverse()
 
-        while ( content[0..EOL.size()-1] == EOL){
-            content.delete(0,EOL.size())
+        while ( content[0..leo.size()-1] == leo){
+            content.delete(0,leo.size())
         }
         content.trimToSize()
         content.reverse().toString()
