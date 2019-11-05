@@ -81,8 +81,8 @@ class ClarionStringMixins {
         content.reverse().toString()
     }
 
-    static lineCount(String s){
-        s.split(System.lineSeparator()).size()
+    static lineCount(String s, String eol = System.lineSeparator()){
+        s.split(eol).size()
     }
 
     static ux2dos(String s) {

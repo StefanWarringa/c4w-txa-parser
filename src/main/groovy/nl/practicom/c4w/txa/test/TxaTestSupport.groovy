@@ -13,6 +13,16 @@ import java.nio.file.Paths
 
 trait TxaTestSupport {
 
+    // In tests all content uses unix line endings
+    final static EOL = '\n'
+
+    //Cross-platform content comparison of stringbuffers
+    def assertContentEquals(StringBuffer sb1, StringBuffer sb2) {
+        def sbx1 = sb1.replaceAll(System.lineSeparator(), EOL)
+        def sbx2 = sb2.replaceAll(System.lineSeparator(), EOL)
+        return sbx1.contentEquals(sbx2)
+    }
+
     def assertStructuresAtLine(String content, int lineno, List<String>... structures){
         def n = lineno
         for (s in structures){
