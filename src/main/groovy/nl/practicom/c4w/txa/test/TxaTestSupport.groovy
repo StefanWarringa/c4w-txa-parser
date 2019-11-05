@@ -20,7 +20,7 @@ trait TxaTestSupport {
     def assertContentEquals(StringBuffer sb1, StringBuffer sb2) {
         def sbx1 = sb1.replaceAll(System.lineSeparator(), EOL)
         def sbx2 = sb2.replaceAll(System.lineSeparator(), EOL)
-        return sbx1.contentEquals(sbx2)
+        assert sbx1.contentEquals(sbx2)
     }
 
     def txaContent(String s){
