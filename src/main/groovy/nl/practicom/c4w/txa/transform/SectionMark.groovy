@@ -27,6 +27,7 @@ enum SectionMark {
                     (PROMPTS)    : [],
                     (EMBED)      : [INSTANCES, DEFINITION],
                     (INSTANCES)  : [INSTANCES, DEFINITION],
+                    (INSTANCE)   : [],
                     (DEFINITION) : [SOURCE, GROUP, PROCEDURE, TEMPLATE],
                     (ADDITION)   : [FIELDPROMPT, INSTANCE, PROMPTS],
                     (SCREENCONTROLS) : [QUICKCODE],

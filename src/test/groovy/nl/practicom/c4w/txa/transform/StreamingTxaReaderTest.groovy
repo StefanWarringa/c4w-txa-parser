@@ -133,6 +133,92 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
         reader.parse('' << content)
         assert handler.sectionsStarted == [MODULE,PROCEDURE,COMMON,EMBED,DEFINITION,PROCEDURE,PROCEDURE]
         assert handler.sectionsClosed == [PROCEDURE,DEFINITION,EMBED,COMMON,PROCEDURE,PROCEDURE,MODULE]
+    }
 
+    void testApplicationSkeleton(){
+        def content = '''\
+            [APPLICATION]
+                 [COMMON]
+                    [DATA]
+                    [FILES]
+                    [PROMPTS]
+                    [EMBED]
+                    [END]
+                    [ADDITION]
+                        [FIELDPROMPT]
+                        [INSTANCE]
+                        [PROMPTS]
+                 [PERSIST]
+                 [PROJECT]
+                 [PROGRAM]
+                    [COMMON]
+                        [DATA]
+                            [SCREENCONTROLS]
+                            [REPORTCONTROLS]
+                                [QUICKCODE]
+                        [EMBED]
+                        [END]
+                 [END]
+                 [MODULE]
+                    [COMMON]
+                    [PROCEDURE]
+                        [COMMON]
+                 [END]
+            [END]
+        '''.trimLines()
+
+        assertSectionsClosedCorrectly(content)
+        (reader, handler, ctx) = setupStreamingTxaReader()
+        reader.parse('' << content)
+        assert handler.sectionsStarted == [
+                APPLICATION,
+                COMMON,
+                DATA,
+                FILES,
+                PROMPTS,
+                EMBED,
+                ADDITION,
+                FIELDPROMPT,
+                INSTANCE,
+                PROMPTS,
+                PERSIST,
+                PROJECT,
+                PROGRAM,
+                COMMON,
+                DATA,
+                SCREENCONTROLS,
+                REPORTCONTROLS,
+                QUICKCODE,
+                EMBED,
+                MODULE,
+                COMMON,
+                PROCEDURE,
+                COMMON
+        ]
+        assert handler.sectionsClosed == [
+                DATA,
+                FILES,
+                PROMPTS,
+                EMBED,
+                FIELDPROMPT,
+                INSTANCE,
+                PROMPTS,
+                ADDITION,
+                COMMON,
+                PERSIST,
+                PROJECT,
+                SCREENCONTROLS,
+                QUICKCODE,
+                REPORTCONTROLS,
+                DATA,
+                EMBED,
+                COMMON,
+                PROGRAM,
+                COMMON,
+                COMMON,
+                PROCEDURE,
+                MODULE,
+                APPLICATION
+        ]
     }
 }
