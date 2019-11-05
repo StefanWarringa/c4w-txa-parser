@@ -23,6 +23,10 @@ trait TxaTestSupport {
         return sbx1.contentEquals(sbx2)
     }
 
+    def txaContent(String s){
+        s.replaceAll(System.lineSeparator(), EOL).trimLines(EOL)
+    }
+
     def assertStructuresAtLine(String content, int lineno, List<String>... structures){
         def n = lineno
         for (s in structures){
@@ -41,7 +45,7 @@ trait TxaTestSupport {
 
     def assertSectionsClosedCorrectly(String s){
         def level = 0
-        for (line in s.toLineArray()*.trim()){
+        for (line in s.toLineArray(EOL)*.trim()){
             if(line.isSectionMark()){
                 SectionMark section = line.asSectionMark()
                 if ( section.requiresExplicitEnd()){

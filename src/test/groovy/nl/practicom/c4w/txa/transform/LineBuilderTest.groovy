@@ -1,8 +1,9 @@
 package nl.practicom.c4w.txa.transform
 
 import nl.practicom.c4w.txa.meta.ClarionStringMixins
+import nl.practicom.c4w.txa.test.TxaTestSupport
 
-class LineBuilderTest extends GroovyTestCase {
+class LineBuilderTest extends GroovyTestCase implements TxaTestSupport {
 
     LineBuilder lineBuilder
     def logicalLines
@@ -79,7 +80,7 @@ class LineBuilderTest extends GroovyTestCase {
     }
 
     void testWindowStructure(){
-        def content = """\
+        def content = txaContent("""\
             [WINDOW]
             AppFrame APPLICATION('INkoop VERkoop VOorraad')
                       MENUBAR,USE(?MENUBAR1),#ORDINAL(1)
@@ -90,9 +91,9 @@ class LineBuilderTest extends GroovyTestCase {
                               #ORDINAL(2)
                         END
                       END\
-        """.trimLines('\n')
+        """)
 
-        content.split('\n').each { line ->
+        content.split(EOL).each { line ->
             lineBuilder.accept(line,rawHandler,logicalHandler)
         }
 
@@ -107,6 +108,6 @@ class LineBuilderTest extends GroovyTestCase {
                 "END"
         ]
 
-        assert rawLines == content.split('\n')
+        assert rawLines == content.split(EOL)
     }
 }

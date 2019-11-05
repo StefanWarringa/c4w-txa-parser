@@ -4,7 +4,6 @@ import nl.practicom.c4w.txa.test.TxaTestSupport
 import nl.practicom.c4w.txa.meta.ClarionDateMixins
 import nl.practicom.c4w.txa.meta.ClarionStringMixins
 
-import static nl.practicom.c4w.txa.test.TxaTestSupport.*
 import static nl.practicom.c4w.txa.transform.SectionMark.*
 
 class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
@@ -20,12 +19,12 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
     }
 
     void testFlatListOfProcedures() {
-        def content = '''\
+        def content = txaContent('''\
         [PROCEDURE]
         NAME P1
         [PROCEDURE]
         NAME P2
-        '''.trimLines()
+        ''')
 
         (reader,handler, ctx) = setupStreamingTxaReader()
         reader.parse('' << content)
@@ -36,7 +35,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
     }
 
     void testSimpleEmbedPoint(){
-        def content = '''\
+        def content = txaContent('''\
           [EMBED]
             EMBED embedpoint1
             [DEFINITION]
@@ -46,7 +45,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
               [TEMPLATE]
             [END]  
           [END]
-        '''.trimLines()
+        ''')
 
         assertSectionsClosedCorrectly(content)
         (reader, handler, ctx) = setupStreamingTxaReader()
@@ -57,7 +56,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
     }
 
     void testComplexEmbedPoint(){
-        def content = '''\
+        def content = txaContent('''\
           [EMBED]
             EMBED embedpoint1
             [DEFINITION]
@@ -73,7 +72,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
                 [END]
             [END]
           [END]
-        '''.trimLines()
+        ''')
 
         assertSectionsClosedCorrectly(content)
         (reader, handler, ctx) = setupStreamingTxaReader()
@@ -83,7 +82,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
     }
 
     void testMultipleEmbedPoints(){
-        def content = '''\
+        def content = txaContent('''\
           [EMBED]
             EMBED embedpoint2
             [INSTANCES]
@@ -99,7 +98,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
               [END]
             [END]
           [END]
-        '''.trimLines()
+        ''')
 
         assertSectionsClosedCorrectly(content)
         (reader, handler, ctx) = setupStreamingTxaReader()
@@ -109,7 +108,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
     }
 
     void testProcedureWithEmbeddedProcedureCall(){
-        def content = '''\
+        def content = txaContent('''\
             [MODULE]
                  [PROCEDURE]
                  NAME P1
@@ -126,7 +125,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
                  NAME P2
                  FROM ABC Browse
              [END]
-        '''.trimLines()
+        ''')
 
         assertSectionsClosedCorrectly(content)
         (reader, handler, ctx) = setupStreamingTxaReader()
@@ -136,7 +135,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
     }
 
     void testApplicationSkeleton(){
-        def content = '''\
+        def content = txaContent('''\
             [APPLICATION]
                  [COMMON]
                     [DATA]
@@ -164,8 +163,7 @@ class StreamingTxaReaderTest extends GroovyTestCase implements TxaTestSupport{
                     [PROCEDURE]
                         [COMMON]
                  [END]
-            [END]
-        '''.trimLines()
+        ''')
 
         assertSectionsClosedCorrectly(content)
         (reader, handler, ctx) = setupStreamingTxaReader()
