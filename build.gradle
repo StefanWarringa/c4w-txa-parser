@@ -1,7 +1,21 @@
+import aQute.bnd.gradle.Bundle
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        // See https://github.com/bndtools/bnd/tree/master/biz.aQute.bnd.gradle
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.3.0'
+    }
+}
+
 plugins {
     id 'groovy'
-    id 'ivy-publish'
+    id 'maven-publish'
 }
+
+apply plugin: 'biz.aQute.bnd.builder'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -12,9 +26,9 @@ group 'nl.practicom'
 version '0.1'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
-
 
 dependencies {
     compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.17'
@@ -22,24 +36,24 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-publishing {
-    repositories {
-        ivy {
-            url project.property('publishing.repo.url')
-            patternLayout {
-                artifact "[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"
-                ivy "[organisation]/[module]/ivy-[revision].[ext]"
-            }
-        }
-    }
-    publications {
-        ivy(IvyPublication) {
-            organisation = 'nl.practicom'
-            module = 'c4w-txa'
-            revision = version
-            descriptor.status = 'milestone'
-            descriptor.branch = 'testing'
+jar {
+    // This can be placed in a bnd.bnd file. But it is more convenient
+    // to keep everything together here
+    bnd (
+            'Bundle-Name'           : 'Practicom :: Clarion TXA parser/scanner',
+            'Bundle-SymbolicName'   : 'nl.practicom.c4w.txa',
+            'Export-Package'        : "nl.practicom.c4w.txa.*;ver=${version}" ,
+            '-exportcontents'       : 'nl.practicom.c4w.txa.*'
+    )
+}
 
+task bundle(type: Bundle) {
+    from sourceSets.main.output
+}
+
+publishing {
+    publications {
+        osgiBundle(MavenPublication){
             from components.java
         }
     }

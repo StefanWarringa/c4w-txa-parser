@@ -1,7 +1,0 @@
-ver: 0.1
-Bundle-SymbolicName: nl.practicom.c4w.txa
-Bundle-Name: Practicom :: Clarion TXA parser/scanner
-Bundle-Version: ${ver}
--classpath: build/libs/c4w-txa-0.1.jar
--output: build/bundle/${bsn}-${ver}.jar
-Export-Package: !dll_template.*,*;version=${ver}
