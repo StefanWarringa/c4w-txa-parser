@@ -33,12 +33,12 @@ class StreamingTxaReader {
     }
 
     def parse(String txaFile){
-        this.source = new File(Paths.get(txaFile).normalize().toString()).newReader()
+        this.source = new File(Paths.get(txaFile).normalize().toString()).newReader("ISO-8859-1")
         doParse()
     }
 
     def parse(File txaFile) {
-        this.source = txaFile.newReader()
+        this.source = txaFile.newReader("ISO-8859-1")
         doParse()
     }
 
@@ -48,7 +48,7 @@ class StreamingTxaReader {
     }
 
     def parse(InputStream txaInputStream){
-        this.source = txaInputStream.newReader()
+        this.source = txaInputStream.newReader("ISO-8859-1")
         doParse()
     }
 
