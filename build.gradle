@@ -23,7 +23,11 @@ java {
 }
 
 group 'nl.practicom'
-version '0.1'
+version '1.0'
+
+ext {
+    groovyVersion = '2.4.17'
+}
 
 repositories {
     mavenLocal()
@@ -31,8 +35,8 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.17'
-    compile group: 'org.codehaus.groovy', name: 'groovy-test', version: '2.4.17'
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
+    compile group: 'org.codehaus.groovy', name: 'groovy-test', version: groovyVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
