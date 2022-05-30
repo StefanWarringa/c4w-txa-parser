@@ -1,5 +1,8 @@
 build
+bin
 .idea
+.vscode
+*.code-workspace
 out
 /lib/
 /.gradle/
