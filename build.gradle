@@ -5,8 +5,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // See https://github.com/bndtools/bnd/tree/master/biz.aQute.bnd.gradle
-        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.3.0'
+        // See https://plugins.gradle.org/plugin/biz.aQute.bnd
+        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:6.2.0'
     }
 }
 
@@ -35,20 +35,22 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
-    compile group: 'org.codehaus.groovy', name: 'groovy-test', version: groovyVersion
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
+    implementation group: 'org.codehaus.groovy', name: 'groovy-test', version: groovyVersion
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 jar {
     // This can be placed in a bnd.bnd file. But it is more convenient
     // to keep everything together here
-    bnd (
-            'Bundle-Name'           : 'Practicom :: Clarion TXA parser/scanner',
-            'Bundle-SymbolicName'   : 'nl.practicom.c4w.txa',
-            'Export-Package'        : "nl.practicom.c4w.txa.*;ver=${version}" ,
-            '-exportcontents'       : 'nl.practicom.c4w.txa.*'
-    )
+    bundle {
+        bnd(
+                'Bundle-Name': 'Practicom :: Clarion TXA parser/scanner',
+                'Bundle-SymbolicName': 'nl.practicom.c4w.txa',
+                'Export-Package': "nl.practicom.c4w.txa.*;ver=${archiveVersion}",
+                '-exportcontents': 'nl.practicom.c4w.txa.*'
+        )
+    }
 }
 
 task bundle(type: Bundle) {
