@@ -22,7 +22,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-group 'nl.practicom'
+group 'nl.intreq'
 version '1.0'
 
 ext {
@@ -45,10 +45,10 @@ jar {
     // to keep everything together here
     bundle {
         bnd(
-                'Bundle-Name': 'Practicom :: Clarion TXA parser/scanner',
-                'Bundle-SymbolicName': 'nl.practicom.c4w.txa',
-                'Export-Package': "nl.practicom.c4w.txa.*;ver=${archiveVersion}",
-                '-exportcontents': 'nl.practicom.c4w.txa.*'
+                'Bundle-Name': 'Intreq :: Clarion TXA parser/scanner',
+                'Bundle-SymbolicName': 'nl.intreq.c4w.txa',
+                'Export-Package': "nl.intreq.c4w.txa.*;ver=${archiveVersion}",
+                '-exportcontents': 'nl.intreq.c4w.txa.*'
         )
     }
 }
