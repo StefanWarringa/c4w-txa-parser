@@ -53,18 +53,18 @@ class StreamingTxaReader {
     }
 
     def registerHandler(TxaContentHandler handler){
-        contentHandlers.push(handler)
+        contentHandlers.add(handler)
 
         if (handler instanceof TxaLogicalContentHandler){
-            logicalHandlers.push(handler as TxaLogicalContentHandler)
+            logicalHandlers.add(handler as TxaLogicalContentHandler)
         }
 
         if (handler instanceof  TxaRawContentHandler){
-            rawHandlers.push(handler as TxaRawContentHandler)
+            rawHandlers.add(handler as TxaRawContentHandler)
         }
 
         if ( handler instanceof TxaSectionHandler) {
-            sectionHandlers.push(handler as TxaSectionHandler)
+            sectionHandlers.add(handler as TxaSectionHandler)
         }
     }
 
@@ -109,7 +109,7 @@ class StreamingTxaReader {
             processSectionEnd(ctx, ctx.currentSection)
         }
         while(!ctx.parentSections.isEmpty()){
-            def s = ctx.parentSections.pop()
+            def s = ctx.parentSections.removeLast()
             processSectionEnd(ctx, s)
         }
 
@@ -120,12 +120,12 @@ class StreamingTxaReader {
         if ( section == END ){
             rollupSectionTree(ctx, END)
             if ( !ctx.parentSections.isEmpty()){
-                ctx.currentSection = ctx.parentSections.pop()
+                ctx.currentSection = ctx.parentSections.removeLast()
             }
         } else {
             if ( ctx.currentSection != null) {
                 if ( ctx.currentSection.hasChild(section)) {
-                    ctx.parentSections.push(ctx.currentSection)
+                    ctx.parentSections.add(ctx.currentSection)
                 } else {
                     // Roll up to the parent section for this section marker
                     rollupSectionTree(ctx, section)
@@ -230,7 +230,7 @@ class StreamingTxaReader {
 
             // Roll up sections until we hit a section requiring an explicit [END]
             while (!ctx.parentSections.isEmpty()) {
-                def parentSection = ctx.parentSections.pop()
+                def parentSection = ctx.parentSections.removeLast()
                 processSectionEnd(ctx, parentSection)
                 if (parentSection.requiresExplicitEnd()) {
                     break
@@ -244,7 +244,7 @@ class StreamingTxaReader {
             }
             // Roll up sections until we hit the parent of the passed in section
             while (!ctx.parentSections.isEmpty() && !ctx.parentSections.last().hasChild(section)) {
-                processSectionEnd(ctx,ctx.parentSections.pop())
+                processSectionEnd(ctx,ctx.parentSections.removeLast())
             }
         }
     }
@@ -279,7 +279,7 @@ class StreamingTxaReader {
                         // [END] of [INSTANCES]
                         if (ctx.instanceLevel > 1) {
                             if (ctx.currentEmbedInstance.size() > 0) {
-                                ctx.currentEmbedInstance.pop()
+                                ctx.currentEmbedInstance.removeLast()
                                 ctx.instanceLevel--
                             }
                         } else {

@@ -1,5 +1,6 @@
 package nl.intreq.c4w.txa.parser
 
+import groovy.test.GroovyTestCase
 import nl.intreq.c4w.txa.meta.ClarionStringMixins
 import nl.intreq.c4w.txa.model.Common
 import nl.intreq.c4w.txa.model.EmbedInstance

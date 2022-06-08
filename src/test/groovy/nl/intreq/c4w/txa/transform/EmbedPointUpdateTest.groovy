@@ -1,5 +1,6 @@
 package nl.intreq.c4w.txa.transform
 
+import groovy.test.GroovyTestCase
 import nl.intreq.c4w.txa.test.TxaTestSupport
 
 import static SectionMark.*
@@ -68,7 +69,7 @@ class EmbedPointUpdateTest extends GroovyTestCase implements TxaTestSupport {
         assert ctx.parentSections == [EMBED,INSTANCES]
 
         // Pop the parent instance section
-        ctx.currentSection = ctx.parentSections.pop()
+        ctx.currentSection = ctx.parentSections.removeLast()
         assert ctx.parentSections == [EMBED]
         assert ctx.currentSection == INSTANCES
         ctx.currentLine = END

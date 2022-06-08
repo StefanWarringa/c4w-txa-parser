@@ -1,5 +1,6 @@
 package nl.intreq.c4w.txa.transform
 
+import groovy.test.GroovyTestCase
 import nl.intreq.c4w.txa.test.TxaTestSupport
 import static nl.intreq.c4w.txa.test.TxaTestSupport.*
 import static nl.intreq.c4w.txa.transform.SectionMark.*

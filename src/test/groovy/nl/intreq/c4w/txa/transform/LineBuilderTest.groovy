@@ -1,5 +1,6 @@
 package nl.intreq.c4w.txa.transform
 
+import groovy.test.GroovyTestCase
 import nl.intreq.c4w.txa.meta.ClarionStringMixins
 import nl.intreq.c4w.txa.test.TxaTestSupport
 
@@ -17,12 +18,12 @@ class LineBuilderTest extends GroovyTestCase implements TxaTestSupport {
 
     final def rawHandler = { rawLineNo, rawLine ->
         currentPhysicalLineNo = rawLineNo
-        rawLines.push(rawLine)
+        rawLines.add(rawLine)
     }
 
     final def logicalHandler = {logicalLineNo, logicalLine ->
         currentLogicalLineNo = logicalLineNo
-        logicalLines.push(logicalLine)
+        logicalLines.add(logicalLine)
     }
 
     void setUp() {

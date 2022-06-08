@@ -20,7 +20,7 @@ group 'nl.intreq'
 version '1.0'
 
 ext {
-    groovyVersion = '2.4.17'
+    groovyVersion = '3.0.11'
 }
 
 repositories {
@@ -36,6 +36,7 @@ dependencies {
 
 jar {
     def archiveVersion = project.version
+
     // This can be placed in a bnd.bnd file. But it is more convenient
     // to keep everything together here
     bundle {
@@ -57,5 +58,11 @@ publishing {
         osgiBundle(MavenPublication){
             from components.java
         }
+    }
+}
+
+test {
+    testLogging {
+        events "PASSED", "SKIPPED", "FAILED"
     }
 }
