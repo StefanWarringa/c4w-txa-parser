@@ -59,6 +59,17 @@ publishing {
             from components.java
         }
     }
+    repositories {
+        mavenLocal()
+        maven {
+            name = 'GithubPackages'
+            url = "https://maven.pkg.github.com/swarringa/c4w-txa-parser"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 test {
